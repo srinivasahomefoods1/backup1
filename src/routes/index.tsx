@@ -124,7 +124,42 @@ function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-16">
+      <section className="mx-auto max-w-6xl px-5 py-14">
+        <Reveal>
+          <p className="rule-ornament text-xs uppercase tracking-[0.4em] text-spice">
+            Browse our kitchen
+          </p>
+          <h2 className="mt-4 text-center text-4xl md:text-5xl">Shop by Category</h2>
+        </Reveal>
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {shopCategories.map((c, i) => (
+            <Reveal key={c.label} delay={i * 90}>
+              <Link
+                to={c.href}
+                hash={c.hash}
+                className="lift group relative block h-72 overflow-hidden rounded-sm border border-border"
+              >
+                <img
+                  src={c.image}
+                  alt={c.label}
+                  loading="lazy"
+                  width={1024}
+                  height={768}
+                  className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-deep via-deep/35 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-5 text-background">
+                  <h3 className="font-display text-2xl">{c.label}</h3>
+                  <p className="mt-1 text-sm text-background/75">{c.blurb}</p>
+                  <span className="mt-3 inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-gold">
+                    Explore <ArrowRight className="size-3" />
+                  </span>
+                </div>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      </section>
         <div className="grid gap-6 md:grid-cols-3">
           {promises.map((p, i) => (
             <Reveal key={p.title} delay={i * 100}>
