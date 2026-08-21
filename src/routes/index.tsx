@@ -136,7 +136,7 @@ function Home() {
             <Reveal key={c.label} delay={i * 90}>
               <Link
                 to={c.href}
-                hash={c.hash}
+                {...(c.hash ? { hash: c.hash } : {})}
                 className="lift group relative block h-72 overflow-hidden rounded-sm border border-border"
               >
                 <img
