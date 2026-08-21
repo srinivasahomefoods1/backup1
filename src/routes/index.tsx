@@ -34,6 +34,44 @@ const promises = [
   { icon: Truck, title: "Hygienic Packing", body: "Sealed food-grade packs, safe delivery available." },
 ];
 
+const shopCategories = [
+  {
+    label: "Traditional Savoury",
+    href: "/menu",
+    hash: "snacks",
+    image: categories.find((c) => c.id === "snacks")!.image,
+    blurb: "Crisp Andhra teatime snacks",
+  },
+  {
+    label: "Sweets",
+    href: "/menu",
+    hash: "sweets",
+    image: categories.find((c) => c.id === "sweets")!.image,
+    blurb: "Jaggery-sweetened festive treats",
+  },
+  {
+    label: "Podulu",
+    href: "/menu",
+    hash: "podi",
+    image: categories.find((c) => c.id === "podi")!.image,
+    blurb: "Stone-ground spice powders",
+  },
+  {
+    label: "Gift Combos",
+    href: "/contact",
+    hash: undefined,
+    image: giftCombosImg,
+    blurb: "Curated hampers for every occasion",
+  },
+  {
+    label: "Festival Specials",
+    href: "/contact",
+    hash: undefined,
+    image: festivalSpecialsImg,
+    blurb: "Seasonal specials for the celebrations",
+  },
+];
+
 function Home() {
   const featured = ["karivepaku-podi", "vellulli-podi", "sunnundalu", "murukulu"]
     .map((id) => products.find((p) => p.id === id)!)
