@@ -63,28 +63,28 @@
 
 :root {
   --radius: 0.25rem;
-  --background: oklch(0.977 0.014 88);
-  --foreground: oklch(0.24 0.045 45);
-  --card: oklch(0.992 0.008 90);
-  --card-foreground: oklch(0.24 0.045 45);
-  --popover: oklch(0.992 0.008 90);
-  --popover-foreground: oklch(0.24 0.045 45);
-  --primary: oklch(0.32 0.075 148);
-  --primary-foreground: oklch(0.977 0.014 88);
-  --secondary: oklch(0.94 0.03 85);
-  --secondary-foreground: oklch(0.32 0.075 148);
-  --muted: oklch(0.945 0.02 85);
-  --muted-foreground: oklch(0.48 0.035 60);
-  --accent: oklch(0.74 0.14 74);
-  --accent-foreground: oklch(0.24 0.06 45);
+  --background: oklch(0.975 0.014 78);
+  --foreground: oklch(0.28 0.09 22);
+  --card: oklch(0.988 0.009 82);
+  --card-foreground: oklch(0.28 0.09 22);
+  --popover: oklch(0.988 0.009 82);
+  --popover-foreground: oklch(0.28 0.09 22);
+  --primary: oklch(0.32 0.12 20);
+  --primary-foreground: oklch(0.975 0.014 78);
+  --secondary: oklch(0.945 0.024 74);
+  --secondary-foreground: oklch(0.32 0.12 20);
+  --muted: oklch(0.948 0.018 76);
+  --muted-foreground: oklch(0.5 0.045 40);
+  --accent: oklch(0.76 0.115 76);
+  --accent-foreground: oklch(0.28 0.09 22);
   --destructive: oklch(0.5 0.18 27);
-  --destructive-foreground: oklch(0.977 0.014 88);
-  --border: oklch(0.89 0.028 82);
-  --input: oklch(0.89 0.028 82);
-  --ring: oklch(0.74 0.14 74);
-  --spice: oklch(0.55 0.19 38);
-  --gold: oklch(0.78 0.13 82);
-  --deep: oklch(0.24 0.05 150);
+  --destructive-foreground: oklch(0.975 0.014 78);
+  --border: oklch(0.9 0.024 76);
+  --input: oklch(0.9 0.024 76);
+  --ring: oklch(0.76 0.115 76);
+  --spice: oklch(0.42 0.14 24);
+  --gold: oklch(0.76 0.115 76);
+  --deep: oklch(0.26 0.1 21);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -101,9 +101,10 @@
 
   --font-display: "Marcellus", Georgia, serif;
   --font-body: "Karla", system-ui, sans-serif;
-  --gradient-deep: linear-gradient(150deg, oklch(0.26 0.055 150), oklch(0.19 0.04 152));
-  --shadow-warm: 0 18px 45px -22px oklch(0.32 0.075 148 / 0.45);
+  --gradient-deep: linear-gradient(150deg, oklch(0.3 0.11 21), oklch(0.21 0.08 20));
+  --shadow-warm: 0 18px 45px -22px oklch(0.32 0.12 20 / 0.45);
 }
+
 
 .dark {
   --background: oklch(0.129 0.042 264.695);
@@ -171,7 +172,7 @@
 
 @utility surface-deep {
   background-image: var(--gradient-deep);
-  color: oklch(0.96 0.02 88);
+  color: oklch(0.96 0.018 82);
 }
 
 @utility rule-ornament {
