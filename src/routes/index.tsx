@@ -150,7 +150,7 @@ function Home() {
             />
           </Reveal>
           <Reveal delay={120}>
-            <p className="text-xs uppercase tracking-[0.4em] text-spice">Small batches only</p>
+            <p className="text-xs uppercase tracking-[0.4em] text-spice">SMALL AND LARGE BATCH PRODUCTIONS</p>
             <h2 className="mt-4 text-4xl leading-tight">
               Freshly prepared for authentic taste &amp; quality
             </h2>
