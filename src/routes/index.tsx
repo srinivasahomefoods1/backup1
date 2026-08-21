@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Leaf, ShieldCheck, Truck } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import kitchenImg from "@/assets/kitchen.jpg";
+import giftCombosImg from "@/assets/gift-combos.jpg";
+import festivalSpecialsImg from "@/assets/festival-specials.jpg";
 import { ProductCard } from "@/components/ProductCard";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
