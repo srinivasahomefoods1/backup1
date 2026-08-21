@@ -160,6 +160,8 @@ function Home() {
           ))}
         </div>
       </section>
+
+      <section className="mx-auto max-w-6xl px-5 py-16">
         <div className="grid gap-6 md:grid-cols-3">
           {promises.map((p, i) => (
             <Reveal key={p.title} delay={i * 100}>
