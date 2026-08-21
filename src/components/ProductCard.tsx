@@ -51,6 +51,7 @@ export function ProductCard({ product }: { product: Product }) {
           <span className="font-display text-2xl text-spice">{inr(product.prices[size])}</span>
           <Button
             size="sm"
+            className="bg-gold text-accent-foreground shadow hover:bg-gold/90"
             onClick={() => {
               add(product.id, size);
               setOpen(true);
