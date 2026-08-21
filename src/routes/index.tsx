@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Leaf, ShieldCheck, Truck } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import kitchenImg from "@/assets/kitchen.jpg";
+import giftCombosImg from "@/assets/gift-combos.jpg";
+import festivalSpecialsImg from "@/assets/festival-specials.jpg";
 import { ProductCard } from "@/components/ProductCard";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
@@ -30,6 +32,44 @@ const promises = [
   { icon: Leaf, title: "100% Homemade", body: "Cooked in a family kitchen, never a factory line." },
   { icon: ShieldCheck, title: "No Preservatives", body: "Zero added colours or shelf-life chemicals." },
   { icon: Truck, title: "Hygienic Packing", body: "Sealed food-grade packs, safe delivery available." },
+];
+
+const shopCategories = [
+  {
+    label: "Traditional Savoury",
+    href: "/menu",
+    hash: "snacks",
+    image: categories.find((c) => c.id === "snacks")!.image,
+    blurb: "Crisp Andhra teatime snacks",
+  },
+  {
+    label: "Sweets",
+    href: "/menu",
+    hash: "sweets",
+    image: categories.find((c) => c.id === "sweets")!.image,
+    blurb: "Jaggery-sweetened festive treats",
+  },
+  {
+    label: "Podulu",
+    href: "/menu",
+    hash: "podi",
+    image: categories.find((c) => c.id === "podi")!.image,
+    blurb: "Stone-ground spice powders",
+  },
+  {
+    label: "Gift Combos",
+    href: "/contact",
+    hash: undefined,
+    image: giftCombosImg,
+    blurb: "Curated hampers for every occasion",
+  },
+  {
+    label: "Festival Specials",
+    href: "/contact",
+    hash: undefined,
+    image: festivalSpecialsImg,
+    blurb: "Seasonal specials for the celebrations",
+  },
 ];
 
 function Home() {
@@ -81,6 +121,43 @@ function Home() {
               <Link to="/contact">Send an enquiry</Link>
             </Button>
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 py-14">
+        <Reveal>
+          <p className="rule-ornament text-xs uppercase tracking-[0.4em] text-spice">
+            Browse our kitchen
+          </p>
+          <h2 className="mt-4 text-center text-4xl md:text-5xl">Shop by Category</h2>
+        </Reveal>
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {shopCategories.map((c, i) => (
+            <Reveal key={c.label} delay={i * 90}>
+              <Link
+                to={c.href}
+                {...(c.hash ? { hash: c.hash } : {})}
+                className="lift group relative block h-72 overflow-hidden rounded-sm border border-border"
+              >
+                <img
+                  src={c.image}
+                  alt={c.label}
+                  loading="lazy"
+                  width={1024}
+                  height={768}
+                  className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-deep via-deep/35 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-5 text-background">
+                  <h3 className="font-display text-2xl">{c.label}</h3>
+                  <p className="mt-1 text-sm text-background/75">{c.blurb}</p>
+                  <span className="mt-3 inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-gold">
+                    Explore <ArrowRight className="size-3" />
+                  </span>
+                </div>
+              </Link>
+            </Reveal>
+          ))}
         </div>
       </section>
 
