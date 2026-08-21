@@ -38,8 +38,8 @@ export function ProductCard({ product }: { product: Product }) {
               className={cn(
                 "flex-1 rounded-sm border px-2 py-1.5 text-xs transition-colors",
                 size === s
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border text-muted-foreground hover:border-primary/50",
+                  ? "border-gold bg-gold text-accent-foreground"
+                  : "border-border text-muted-foreground hover:border-gold/50",
               )}
             >
               {s}
