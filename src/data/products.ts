@@ -2,6 +2,7 @@ import podiImg from "@/assets/podi.jpg";
 import snacksImg from "@/assets/snacks.jpg";
 import sweetsImg from "@/assets/sweets.jpg";
 import murukuluImg from "@/assets/murukulu.jpeg.asset.json";
+import ladduImg from "@/assets/laddu.jpeg.asset.json";
 
 export type Category = "podi" | "snacks" | "sweets";
 
