@@ -5,6 +5,7 @@ import murukuluImg from "@/assets/murukulu.jpeg.asset.json";
 import ladduImg from "@/assets/laddu.jpeg.asset.json";
 import sunnundaImg from "@/assets/sunnunda.jpeg.asset.json";
 import karivepakuImg from "@/assets/karivepaku_podi.png.asset.json";
+import vellulliImg from "@/assets/velluli_podi.png.asset.json";
 
 export type Category = "podi" | "snacks" | "sweets";
 
