@@ -11,6 +11,7 @@ export interface Product {
   category: Category;
   prices: { "250g": number; "500g": number; "1kg": number };
   note?: string;
+  image?: string;
 }
 
 export const SIZES = ["250g", "500g", "1kg"] as const;
