@@ -1,6 +1,7 @@
 import podiImg from "@/assets/podi.jpg";
 import snacksImg from "@/assets/snacks.jpg";
 import sweetsImg from "@/assets/sweets.jpg";
+import murukuluImg from "@/assets/murukulu.jpeg.asset.json";
 
 export type Category = "podi" | "snacks" | "sweets";
 
@@ -11,6 +12,7 @@ export interface Product {
   category: Category;
   prices: { "250g": number; "500g": number; "1kg": number };
   note?: string;
+  image?: string;
 }
 
 export const SIZES = ["250g", "500g", "1kg"] as const;
@@ -55,7 +57,7 @@ export const products: Product[] = [
 
   { id: "karappusa", name: "Karappusa", category: "snacks", prices: p(100, 200, 400) },
   { id: "chegodilu", name: "Chegodilu", category: "snacks", prices: p(100, 200, 400) },
-  { id: "murukulu", name: "Murukulu", category: "snacks", prices: p(100, 200, 400) },
+  { id: "murukulu", name: "Murukulu", category: "snacks", prices: p(100, 200, 400), image: murukuluImg.url },
   { id: "pappu-chekkalu", name: "Pappu Chekkalu", note: "Karappalu", category: "snacks", prices: p(125, 250, 500) },
   { id: "atukula-chuduva", name: "Atukula Chuduva", category: "snacks", prices: p(100, 200, 400) },
   { id: "sakinalu", name: "Sakinalu", category: "snacks", prices: p(125, 250, 500) },

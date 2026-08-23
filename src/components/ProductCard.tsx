@@ -13,7 +13,7 @@ export function ProductCard({ product }: { product: Product }) {
     <article className="lift group flex flex-col overflow-hidden rounded-sm border border-border bg-card">
       <div className="relative h-44 overflow-hidden">
         <img
-          src={imageFor(product.category)}
+          src={product.image ?? imageFor(product.category)}
           alt={product.name}
           loading="lazy"
           width={1024}
