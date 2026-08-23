@@ -4,6 +4,7 @@ import sweetsImg from "@/assets/sweets.jpg";
 import murukuluImg from "@/assets/murukulu.jpeg.asset.json";
 import ladduImg from "@/assets/laddu.jpeg.asset.json";
 import sunnundaImg from "@/assets/sunnunda.jpeg.asset.json";
+import karivepakuImg from "@/assets/karivepaku_podi.png.asset.json";
 
 export type Category = "podi" | "snacks" | "sweets";
 
@@ -49,7 +50,7 @@ export const categories: {
 const p = (a: number, b: number, c: number) => ({ "250g": a, "500g": b, "1kg": c });
 
 export const products: Product[] = [
-  { id: "karivepaku-podi", name: "Karivepaku Podi", telugu: "కరివేపాకు పొడి", category: "podi", prices: p(160, 260, 500) },
+  { id: "karivepaku-podi", name: "Karivepaku Podi", telugu: "కరివేపాకు పొడి", category: "podi", prices: p(160, 260, 500), image: karivepakuImg.url },
   { id: "vellulli-podi", name: "Vellulli Podi", telugu: "వెల్లుల్లి పొడి", category: "podi", prices: p(160, 260, 500) },
   { id: "kandi-podi", name: "Kandi Podi", telugu: "కంది పొడి", category: "podi", prices: p(160, 260, 500) },
   { id: "munagaku-podi", name: "Munagaku Podi", telugu: "మునగాకు పొడి", category: "podi", prices: p(160, 260, 500) },
