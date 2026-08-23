@@ -57,7 +57,7 @@ export const products: Product[] = [
 
   { id: "karappusa", name: "Karappusa", category: "snacks", prices: p(100, 200, 400) },
   { id: "chegodilu", name: "Chegodilu", category: "snacks", prices: p(100, 200, 400) },
-  { id: "murukulu", name: "Murukulu", category: "snacks", prices: p(100, 200, 400) },
+  { id: "murukulu", name: "Murukulu", category: "snacks", prices: p(100, 200, 400), image: murukuluImg.url },
   { id: "pappu-chekkalu", name: "Pappu Chekkalu", note: "Karappalu", category: "snacks", prices: p(125, 250, 500) },
   { id: "atukula-chuduva", name: "Atukula Chuduva", category: "snacks", prices: p(100, 200, 400) },
   { id: "sakinalu", name: "Sakinalu", category: "snacks", prices: p(125, 250, 500) },
