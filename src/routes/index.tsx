@@ -37,36 +37,34 @@ const promises = [
 const shopCategories = [
   {
     label: "Traditional Savoury",
-    href: "/menu",
-    hash: "snacks",
+    to: "/menu" as const,
+    search: { cat: "snacks" },
     image: categories.find((c) => c.id === "snacks")!.image,
     blurb: "Crisp Andhra teatime snacks",
   },
   {
     label: "Sweets",
-    href: "/menu",
-    hash: "sweets",
+    to: "/menu" as const,
+    search: { cat: "sweets" },
     image: categories.find((c) => c.id === "sweets")!.image,
     blurb: "Jaggery-sweetened festive treats",
   },
   {
     label: "Podulu",
-    href: "/menu",
-    hash: "podi",
+    to: "/menu" as const,
+    search: { cat: "podi" },
     image: categories.find((c) => c.id === "podi")!.image,
     blurb: "Stone-ground spice powders",
   },
   {
     label: "Gift Combos",
-    href: "/contact",
-    hash: undefined,
+    to: "/contact" as const,
     image: giftCombosImg,
     blurb: "Curated hampers for every occasion",
   },
   {
     label: "Festival Specials",
-    href: "/contact",
-    hash: undefined,
+    to: "/contact" as const,
     image: festivalSpecialsImg,
     blurb: "Seasonal specials for the celebrations",
   },
@@ -135,8 +133,8 @@ function Home() {
           {shopCategories.map((c, i) => (
             <Reveal key={c.label} delay={i * 90}>
               <Link
-                to={c.href}
-                {...(c.hash ? { hash: c.hash } : {})}
+                to={c.to}
+                search={"search" in c ? c.search : undefined}
                 className="lift group relative block h-72 overflow-hidden rounded-sm border border-border"
               >
                 <img
@@ -189,7 +187,7 @@ function Home() {
             <Reveal key={c.id} delay={i * 120}>
               <Link
                 to="/menu"
-                hash={c.id}
+                search={{ cat: c.id }}
                 className="lift group relative block h-80 overflow-hidden rounded-sm"
               >
                 <img
@@ -229,7 +227,7 @@ function Home() {
           <Reveal delay={120}>
             <p className="text-xs uppercase tracking-[0.4em] text-spice">SMALL AND LARGE BATCH PRODUCTIONS</p>
             <h2 className="mt-4 text-4xl leading-tight">
-              Freshly prepared for authentic taste &amp; quality
+              Freshly prepared for authentic taste & quality
             </h2>
             <p className="mt-5 text-muted-foreground">
               Every podi is dry-roasted to order and ground the same week it reaches you. Snacks are
