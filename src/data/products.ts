@@ -8,6 +8,7 @@ import karivepakuImg from "@/assets/karivepaku_podi.png.asset.json";
 import vellulliImg from "@/assets/velluli_podi.png.asset.json";
 import kandiImg from "@/assets/Kandi_podi.png.asset.json";
 import munagakuImg from "@/assets/Munagaku_podi.png.asset.json";
+import kakarakayaImg from "@/assets/kakarakaya_podi.png.asset.json";
 
 export type Category = "podi" | "snacks" | "sweets";
 
@@ -57,7 +58,7 @@ export const products: Product[] = [
   { id: "vellulli-podi", name: "Vellulli Podi", telugu: "వెల్లుల్లి పొడి", category: "podi", prices: p(160, 260, 500), image: vellulliImg.url },
   { id: "kandi-podi", name: "Kandi Podi", telugu: "కంది పొడి", category: "podi", prices: p(160, 260, 500), image: kandiImg.url },
   { id: "munagaku-podi", name: "Munagaku Podi", telugu: "మునగాకు పొడి", category: "podi", prices: p(160, 260, 500), image: munagakuImg.url },
-  { id: "kakarakaya-podi", name: "Kakarakaya Podi", telugu: "కాకరకాయ పొడి", category: "podi", prices: p(160, 260, 500) },
+  { id: "kakarakaya-podi", name: "Kakarakaya Podi", telugu: "కాకరకాయ పొడి", category: "podi", prices: p(160, 260, 500), image: kakarakayaImg.url },
   { id: "idli-karam-podi", name: "Idli Karam Podi", telugu: "ఇడ్లీ కారం పొడి", category: "podi", prices: p(160, 260, 500) },
   { id: "putnala-podi", name: "Putnala Podi", telugu: "పుట్నాల పొడి", category: "podi", prices: p(160, 260, 500) },
 
