@@ -9,6 +9,7 @@ import vellulliImg from "@/assets/velluli_podi.png.asset.json";
 import kandiImg from "@/assets/Kandi_podi.png.asset.json";
 import munagakuImg from "@/assets/Munagaku_podi.png.asset.json";
 import kakarakayaImg from "@/assets/kakarakaya_podi.png.asset.json";
+import idlyKaramImg from "@/assets/idly_karam_podi.png.asset.json";
 
 export type Category = "podi" | "snacks" | "sweets";
 
