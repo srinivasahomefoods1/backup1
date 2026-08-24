@@ -11,14 +11,14 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <article className="lift group flex flex-col overflow-hidden rounded-sm border border-border bg-card">
-      <div className="relative h-44 overflow-hidden">
+      <div className="relative h-44 overflow-hidden bg-muted">
         <img
           src={product.image ?? imageFor(product.category)}
           alt={product.name}
           loading="lazy"
           width={1024}
           height={768}
-          className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className="size-full object-contain transition-transform duration-700 group-hover:scale-105"
         />
         <span className="absolute left-3 top-3 rounded-sm bg-background/90 px-2 py-1 text-[0.6rem] uppercase tracking-[0.2em] text-primary">
           {product.category === "podi" ? "Podi" : product.category === "snacks" ? "Snack" : "Sweet"}
