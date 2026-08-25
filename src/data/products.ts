@@ -62,7 +62,7 @@ export const products: Product[] = [
   { id: "munagaku-podi", name: "Munagaku Podi", telugu: "మునగాకు పొడి", category: "podi", prices: p(160, 260, 500), image: munagakuImg.url },
   { id: "kakarakaya-podi", name: "Kakarakaya Podi", telugu: "కాకరకాయ పొడి", category: "podi", prices: p(160, 260, 500), image: kakarakayaImg.url },
   { id: "idli-karam-podi", name: "Idli Karam Podi", telugu: "ఇడ్లీ కారం పొడి", category: "podi", prices: p(160, 260, 500), image: idlyKaramImg.url },
-  { id: "putnala-podi", name: "Putnala Podi", telugu: "పుట్నాల పొడి", category: "podi", prices: p(160, 260, 500) },
+  { id: "putnala-podi", name: "Putnala Podi", telugu: "పుట్నాల పొడి", category: "podi", prices: p(160, 260, 500), image: putnalaImg.url },
 
   { id: "karappusa", name: "Karappusa", category: "snacks", prices: p(100, 200, 400) },
   { id: "chegodilu", name: "Chegodilu", category: "snacks", prices: p(100, 200, 400) },
