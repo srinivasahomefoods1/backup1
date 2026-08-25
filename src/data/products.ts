@@ -11,6 +11,7 @@ import munagakuImg from "@/assets/Munagaku_podi.png.asset.json";
 import kakarakayaImg from "@/assets/kakarakaya_podi.png.asset.json";
 import idlyKaramImg from "@/assets/idly_karam_podi.png.asset.json";
 import putnalaImg from "@/assets/putnala_podi.png.asset.json";
+import kajjikayaluImg from "@/assets/bellam_kajjikayalu.png.asset.json";
 
 export type Category = "podi" | "snacks" | "sweets";
 
@@ -74,10 +75,10 @@ export const products: Product[] = [
   { id: "namak-pare", name: "Namak Pare", category: "snacks", prices: p(100, 200, 400) },
 
   { id: "ragi-laddulu", name: "Ragi Laddulu", category: "sweets", prices: p(200, 400, 800), image: ladduImg.url },
-  { id: "bellam-kajjikayalu", name: "Bellam Kajjikayalu", category: "sweets", prices: p(130, 260, 520) },
+  { id: "bellam-kajjikayalu", name: "Bellam Kajjikayalu", category: "sweets", prices: p(130, 260, 520), image: kajjikayaluImg.url },
   { id: "bellam-gavvalu", name: "Bellam Gavvalu", category: "sweets", prices: p(120, 240, 480) },
   { id: "sunnundalu", name: "Sunnundalu", category: "sweets", prices: p(200, 400, 800), image: sunnundaImg.url },
-  { id: "kova-kajjikayalu", name: "Kova Kajjikayalu", category: "sweets", prices: p(200, 400, 800) },
+  { id: "kova-kajjikayalu", name: "Kova Kajjikayalu", category: "sweets", prices: p(200, 400, 800), image: kajjikayaluImg.url },
   { id: "poornam-boorelu", name: "Poornam Boorelu", category: "sweets", prices: p(150, 300, 600) },
 ];
 
