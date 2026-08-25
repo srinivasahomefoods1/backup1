@@ -34,37 +34,45 @@ const promises = [
   { icon: Truck, title: "Hygienic Packing", body: "Sealed food-grade packs, safe delivery available." },
 ];
 
-const shopCategories = [
+type ShopCategory = {
+  label: string;
+  to: "/menu" | "/contact";
+  search?: { cat: string };
+  image: string;
+  blurb: string;
+};
+
+const shopCategories: ShopCategory[] = [
   {
     label: "Traditional Savoury",
-    to: "/menu" as const,
+    to: "/menu",
     search: { cat: "snacks" },
     image: categories.find((c) => c.id === "snacks")!.image,
     blurb: "Crisp Andhra teatime snacks",
   },
   {
     label: "Sweets",
-    to: "/menu" as const,
+    to: "/menu",
     search: { cat: "sweets" },
     image: categories.find((c) => c.id === "sweets")!.image,
     blurb: "Jaggery-sweetened festive treats",
   },
   {
     label: "Podulu",
-    to: "/menu" as const,
+    to: "/menu",
     search: { cat: "podi" },
     image: categories.find((c) => c.id === "podi")!.image,
     blurb: "Stone-ground spice powders",
   },
   {
     label: "Gift Combos",
-    to: "/contact" as const,
+    to: "/contact",
     image: giftCombosImg,
     blurb: "Curated hampers for every occasion",
   },
   {
     label: "Festival Specials",
-    to: "/contact" as const,
+    to: "/contact",
     image: festivalSpecialsImg,
     blurb: "Seasonal specials for the celebrations",
   },
@@ -134,7 +142,7 @@ function Home() {
             <Reveal key={c.label} delay={i * 90}>
               <Link
                 to={c.to}
-                search={"search" in c ? c.search : undefined}
+                {...(c.search ? { search: c.search } : {})}
                 className="lift group relative block h-72 overflow-hidden rounded-sm border border-border"
               >
                 <img
