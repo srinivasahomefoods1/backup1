@@ -14,16 +14,10 @@ const menuSearchSchema = z.object({
 
 export const Route = createFileRoute("/menu")({
   validateSearch: zodValidator(menuSearchSchema),
-  head: ({ search }) => {
-    const cat = search.cat;
-    const isAll = !cat || cat === "all";
-    const label = isAll
-      ? "Menu & Price List"
-      : categories.find((c) => c.id === cat)?.label ?? "Menu";
-    const title = `${label} | Srinivasa Home Foods`;
-    const desc = isAll
-      ? "Full price list of Srinivasa Home Foods: karivepaku, vellulli, kandi and idli karam podi, murukulu, chegodilu, sakinalu, sunnundalu and more in 250g, 500g and 1kg packs."
-      : `Browse our ${label.toLowerCase()} — freshly made in small batches. 250g, 500g and 1kg packs available.`;
+  head: () => {
+    const title = "Menu & Price List | Srinivasa Home Foods";
+    const desc =
+      "Full price list of Srinivasa Home Foods: karivepaku, vellulli, kandi and idli karam podi, murukulu, chegodilu, sakinalu, sunnundalu and more in 250g, 500g and 1kg packs.";
     return {
       meta: [
         { title },
