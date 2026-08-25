@@ -78,7 +78,7 @@ export const products: Product[] = [
   { id: "bellam-kajjikayalu", name: "Bellam Kajjikayalu", category: "sweets", prices: p(130, 260, 520), image: kajjikayaluImg.url },
   { id: "bellam-gavvalu", name: "Bellam Gavvalu", category: "sweets", prices: p(120, 240, 480) },
   { id: "sunnundalu", name: "Sunnundalu", category: "sweets", prices: p(200, 400, 800), image: sunnundaImg.url },
-  { id: "kova-kajjikayalu", name: "Kova Kajjikayalu", category: "sweets", prices: p(200, 400, 800) },
+  { id: "kova-kajjikayalu", name: "Kova Kajjikayalu", category: "sweets", prices: p(200, 400, 800), image: kajjikayaluImg.url },
   { id: "poornam-boorelu", name: "Poornam Boorelu", category: "sweets", prices: p(150, 300, 600) },
 ];
 
