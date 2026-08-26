@@ -13,6 +13,8 @@ import idlyKaramImg from "@/assets/idly_karam_podi.png.asset.json";
 import putnalaImg from "@/assets/putnala_podi.png.asset.json";
 import kajjikayaluImg from "@/assets/bellam_kajjikayalu.png.asset.json";
 import gavvaluImg from "@/assets/bellam_gavvalu.png.asset.json";
+import chegodiluImg from "@/assets/chegodilu.png.asset.json";
+
 
 export type Category = "podi" | "snacks" | "sweets";
 
@@ -67,7 +69,7 @@ export const products: Product[] = [
   { id: "putnala-podi", name: "Putnala Podi", telugu: "పుట్నాల పొడి", category: "podi", prices: p(160, 260, 500), image: putnalaImg.url },
 
   { id: "karappusa", name: "Karappusa", category: "snacks", prices: p(100, 200, 400) },
-  { id: "chegodilu", name: "Chegodilu", category: "snacks", prices: p(100, 200, 400) },
+  { id: "chegodilu", name: "Chegodilu", category: "snacks", prices: p(100, 200, 400), image: chegodiluImg.url },
   { id: "murukulu", name: "Murukulu", category: "snacks", prices: p(100, 200, 400), image: murukuluImg.url },
   { id: "pappu-chekkalu", name: "Pappu Chekkalu", note: "Karappalu", category: "snacks", prices: p(125, 250, 500) },
   { id: "atukula-chuduva", name: "Atukula Chuduva", category: "snacks", prices: p(100, 200, 400) },
