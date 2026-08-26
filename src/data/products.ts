@@ -17,6 +17,7 @@ import chegodiluImg from "@/assets/chegodilu.png.asset.json";
 import pappuChekkaluImg from "@/assets/pappu_chekkalu.png.asset.json";
 import sakinaluImg from "@/assets/sakinalu.png.asset.json";
 import chuduvaImg from "@/assets/chuduva.png.asset.json";
+import namakPareImg from "@/assets/namak_pare.png.asset.json";
 
 
 export type Category = "podi" | "snacks" | "sweets";
@@ -78,7 +79,7 @@ export const products: Product[] = [
   { id: "atukula-chuduva", name: "Atukula Chuduva", category: "snacks", prices: p(100, 200, 400), image: chuduvaImg.url },
   { id: "sakinalu", name: "Sakinalu", category: "snacks", prices: p(125, 250, 500), image: sakinaluImg.url },
   { id: "mixture", name: "Mixture", category: "snacks", prices: p(113, 225, 450) },
-  { id: "namak-pare", name: "Namak Pare", category: "snacks", prices: p(100, 200, 400) },
+  { id: "namak-pare", name: "Namak Pare", category: "snacks", prices: p(100, 200, 400), image: namakPareImg.url },
 
   { id: "ragi-laddulu", name: "Ragi Laddulu", category: "sweets", prices: p(200, 400, 800), image: ladduImg.url },
   { id: "bellam-kajjikayalu", name: "Bellam Kajjikayalu", category: "sweets", prices: p(130, 260, 520), image: kajjikayaluImg.url },
