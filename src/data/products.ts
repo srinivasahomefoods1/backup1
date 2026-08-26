@@ -19,6 +19,7 @@ import sakinaluImg from "@/assets/sakinalu.png.asset.json";
 import chuduvaImg from "@/assets/chuduva.png.asset.json";
 import namakPareImg from "@/assets/namak_pare.png.asset.json";
 import mixtureImg from "@/assets/mixture.png.asset.json";
+import poornamBooreluImg from "@/assets/poornam_boorelu.png.asset.json";
 
 
 export type Category = "podi" | "snacks" | "sweets";
@@ -87,7 +88,7 @@ export const products: Product[] = [
   { id: "bellam-gavvalu", name: "Bellam Gavvalu", category: "sweets", prices: p(120, 240, 480), image: gavvaluImg.url },
   { id: "sunnundalu", name: "Sunnundalu", category: "sweets", prices: p(200, 400, 800), image: sunnundaImg.url },
   { id: "kova-kajjikayalu", name: "Kova Kajjikayalu", category: "sweets", prices: p(200, 400, 800), image: kajjikayaluImg.url },
-  { id: "poornam-boorelu", name: "Poornam Boorelu", category: "sweets", prices: p(150, 300, 600) },
+  { id: "poornam-boorelu", name: "Poornam Boorelu", category: "sweets", prices: p(150, 300, 600), image: poornamBooreluImg.url },
 ];
 
 export const imageFor = (c: Category) =>
