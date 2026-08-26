@@ -15,6 +15,7 @@ import kajjikayaluImg from "@/assets/bellam_kajjikayalu.png.asset.json";
 import gavvaluImg from "@/assets/bellam_gavvalu.png.asset.json";
 import chegodiluImg from "@/assets/chegodilu.png.asset.json";
 import pappuChekkaluImg from "@/assets/pappu_chekkalu.png.asset.json";
+import sakinaluImg from "@/assets/sakinalu.png.asset.json";
 
 
 export type Category = "podi" | "snacks" | "sweets";
