@@ -13,6 +13,8 @@ import idlyKaramImg from "@/assets/idly_karam_podi.png.asset.json";
 import putnalaImg from "@/assets/putnala_podi.png.asset.json";
 import kajjikayaluImg from "@/assets/bellam_kajjikayalu.png.asset.json";
 import gavvaluImg from "@/assets/bellam_gavvalu.png.asset.json";
+import chegodiluImg from "@/assets/chegodilu.png.asset.json";
+
 
 export type Category = "podi" | "snacks" | "sweets";
 
