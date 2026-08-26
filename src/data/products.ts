@@ -74,21 +74,23 @@ export const products: Product[] = [
   { id: "idli-karam-podi", name: "Idli Karam Podi", telugu: "ఇడ్లీ కారం పొడి", category: "podi", prices: p(160, 260, 500), image: idlyKaramImg.url },
   { id: "putnala-podi", name: "Putnala Podi", telugu: "పుట్నాల పొడి", category: "podi", prices: p(160, 260, 500), image: putnalaImg.url },
 
-  { id: "karappusa", name: "Karappusa", category: "snacks", prices: p(100, 200, 400) },
-  { id: "chegodilu", name: "Chegodilu", category: "snacks", prices: p(100, 200, 400), image: chegodiluImg.url },
+  { id: "karappusa", name: "Karappusa", category: "snacks", prices: p(125, 250, 500) },
+  { id: "chegodilu", name: "Chegodilu", category: "snacks", prices: p(125, 250, 500), image: chegodiluImg.url },
   { id: "murukulu", name: "Murukulu", category: "snacks", prices: p(100, 200, 400), image: murukuluImg.url },
   { id: "pappu-chekkalu", name: "Pappu Chekkalu", note: "Karappalu", category: "snacks", prices: p(125, 250, 500), image: pappuChekkaluImg.url },
   { id: "atukula-chuduva", name: "Atukula Chuduva", category: "snacks", prices: p(100, 200, 400), image: chuduvaImg.url },
   { id: "sakinalu", name: "Sakinalu", category: "snacks", prices: p(125, 250, 500), image: sakinaluImg.url },
-  { id: "mixture", name: "Mixture", category: "snacks", prices: p(113, 225, 450), image: mixtureImg.url },
-  { id: "namak-pare", name: "Namak Pare", category: "snacks", prices: p(100, 200, 400), image: namakPareImg.url },
+  { id: "mixture", name: "Mixture", category: "snacks", prices: p(200, 400, 800), image: mixtureImg.url },
+  { id: "namak-pare", name: "Namak Pare", category: "snacks", prices: p(113, 225, 450), image: namakPareImg.url },
 
   { id: "ragi-laddulu", name: "Ragi Laddulu", category: "sweets", prices: p(200, 400, 800), image: ladduImg.url },
   { id: "bellam-kajjikayalu", name: "Bellam Kajjikayalu", category: "sweets", prices: p(130, 260, 520), image: kajjikayaluImg.url },
   { id: "bellam-gavvalu", name: "Bellam Gavvalu", category: "sweets", prices: p(120, 240, 480), image: gavvaluImg.url },
   { id: "sunnundalu", name: "Sunnundalu", category: "sweets", prices: p(200, 400, 800), image: sunnundaImg.url },
-  { id: "kova-kajjikayalu", name: "Kova Kajjikayalu", category: "sweets", prices: p(200, 400, 800), image: kajjikayaluImg.url },
+  { id: "soft-kova-kajjikayalu", name: "Soft Kova Kajjikayalu", category: "sweets", prices: p(250, 500, 1000), image: kajjikayaluImg.url },
+  { id: "crispy-poori-kova-kajjikayalu", name: "Crispy Poori Kova Kajjikayalu", category: "sweets", prices: p(200, 400, 800), image: kajjikayaluImg.url },
   { id: "poornam-boorelu", name: "Poornam Boorelu", category: "sweets", prices: p(150, 300, 600), image: poornamBooreluImg.url },
+  { id: "boondi-laddo", name: "Boondi Laddo", category: "sweets", prices: p(300, 600, 1200) },
 ];
 
 export const imageFor = (c: Category) =>
