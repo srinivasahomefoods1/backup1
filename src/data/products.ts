@@ -105,3 +105,9 @@ export const CONTACT = {
   address: "Plot 24, Vidyanagar, Hyderabad, Telangana 500044",
   hours: "Mon – Sat · 9:00 AM – 8:00 PM",
 };
+
+/** UPI details used for PhonePe / Google Pay / any UPI app checkout. */
+export const UPI = {
+  id: "srinivasahomefoods@upi",
+  payeeName: "Srinivasa Home Foods",
+};
