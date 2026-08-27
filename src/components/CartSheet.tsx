@@ -40,7 +40,7 @@ export function CartSheet() {
         <SheetHeader>
           <SheetTitle className="font-display text-2xl">Your basket</SheetTitle>
           <SheetDescription>
-            Send the basket over WhatsApp and we'll confirm freshness &amp; delivery.
+            Checkout with your delivery details and we'll confirm freshness &amp; delivery.
           </SheetDescription>
         </SheetHeader>
 
@@ -102,8 +102,11 @@ export function CartSheet() {
                 <span className="font-display text-2xl">{inr(total)}</span>
               </div>
               <Separator />
-              <Button className="w-full" size="lg" onClick={orderOnWhatsApp}>
-                Place order on WhatsApp
+              <Button asChild className="w-full" size="lg" onClick={() => setOpen(false)}>
+                <Link to="/checkout">Proceed to checkout</Link>
+              </Button>
+              <Button variant="outline" className="w-full" onClick={orderOnWhatsApp}>
+                Quick order on WhatsApp
               </Button>
               <Button variant="ghost" className="w-full" onClick={clear}>
                 Clear basket
