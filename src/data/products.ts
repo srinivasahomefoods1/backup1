@@ -98,9 +98,9 @@ export const imageFor = (c: Category) =>
   categories.find((x) => x.id === c)!.image;
 
 export const CONTACT = {
-  phone: "+91 98765 43210",
-  phoneHref: "+919876543210",
-  whatsapp: "919876543210",
+  phone: "+91 63036 49148",
+  phoneHref: "+916303649148",
+  whatsapp: "916303649148",
   email: "orders@srinivasahomefoods.in",
   address: "Plot 24, Vidyanagar, Hyderabad, Telangana 500044",
   hours: "Mon – Sat · 9:00 AM – 8:00 PM",
