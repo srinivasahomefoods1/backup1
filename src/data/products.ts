@@ -101,7 +101,7 @@ export const CONTACT = {
   phone: "+91 63036 49148",
   phoneHref: "+916303649148",
   whatsapp: "916303649148",
-  email: "orders@srinivasahomefoods.in",
+  email: "srinivasahomefoods1@gmail.com",
   address: "Plot 24, Vidyanagar, Hyderabad, Telangana 500044",
   hours: "Mon – Sat · 9:00 AM – 8:00 PM",
 };
