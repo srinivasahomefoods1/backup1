@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
+import logoAsset from "@/assets/srinivasa-logo.png.asset.json";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -19,11 +20,20 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-18 max-w-6xl items-center justify-between gap-4 px-5 py-3">
-        <Link to="/" className="group flex flex-col leading-none" onClick={() => setMobile(false)}>
-          <span className="font-display text-xl tracking-wide text-primary sm:text-2xl">
-            Srinivasa
+        <Link to="/" className="group flex items-center gap-3" onClick={() => setMobile(false)}>
+          <img
+            src={logoAsset.url}
+            alt="Srinivasa Home Foods logo"
+            width={44}
+            height={44}
+            className="size-11 rounded-full bg-white object-contain p-0.5 shadow-sm"
+          />
+          <span className="flex flex-col leading-none">
+            <span className="font-display text-xl tracking-wide text-primary sm:text-2xl">
+              Srinivasa
+            </span>
+            <span className="text-[0.62rem] uppercase tracking-[0.42em] text-spice">Home Foods</span>
           </span>
-          <span className="text-[0.62rem] uppercase tracking-[0.42em] text-spice">Home Foods</span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
