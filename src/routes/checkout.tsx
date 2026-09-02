@@ -48,7 +48,9 @@ interface Placed {
   total: number;
   method: PayMethod;
   txn: string;
+  receipt: ReceiptData;
 }
+
 
 function upiLink(method: PayMethod, amount: number, note: string) {
   const params = new URLSearchParams({
