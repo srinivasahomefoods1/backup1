@@ -290,6 +290,17 @@ function Checkout() {
             />
           </div>
           <div className="space-y-2">
+            <Label htmlFor="email">Email (for your receipt)</Label>
+            <Input
+              id="email"
+              type="email"
+              value={form.email}
+              onChange={(e) => set("email")(e.target.value)}
+              placeholder="you@example.com"
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="address">Delivery address *</Label>
             <Textarea
               id="address"
