@@ -1,5 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { AlertCircle, CheckCircle2, Loader2, ShoppingBag, Smartphone, Wallet } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Download,
+  Loader2,
+  Mail,
+  MessageCircle,
+  ShoppingBag,
+  Smartphone,
+  Wallet,
+} from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Reveal } from "@/components/Reveal";
@@ -10,6 +20,8 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { CONTACT, UPI, products } from "@/data/products";
 import { inr, useCart } from "@/lib/cart";
+import { downloadReceipt, shareReceipt, type ReceiptData } from "@/lib/receipt";
+
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
