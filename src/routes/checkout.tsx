@@ -1,5 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { AlertCircle, CheckCircle2, Loader2, ShoppingBag, Smartphone, Wallet } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Download,
+  Loader2,
+  Mail,
+  MessageCircle,
+  ShoppingBag,
+  Smartphone,
+  Wallet,
+} from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Reveal } from "@/components/Reveal";
@@ -10,6 +20,8 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { CONTACT, UPI, products } from "@/data/products";
 import { inr, useCart } from "@/lib/cart";
+import { downloadReceipt, shareReceipt, type ReceiptData } from "@/lib/receipt";
+
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -48,7 +60,9 @@ interface Placed {
   total: number;
   method: PayMethod;
   txn: string;
+  receipt: ReceiptData;
 }
+
 
 function upiLink(method: PayMethod, amount: number, note: string) {
   const params = new URLSearchParams({
@@ -66,7 +80,7 @@ function upiLink(method: PayMethod, amount: number, note: string) {
 function Checkout() {
   const { lines, total, clear } = useCart();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", phone: "", address: "", notes: "" });
+  const [form, setForm] = useState({ name: "", phone: "", email: "", address: "", notes: "" });
   const [method, setMethod] = useState<PayMethod>("phonepe");
   const [status, setStatus] = useState<PayStatus>("idle");
   const [txn, setTxn] = useState("");
@@ -86,7 +100,7 @@ function Checkout() {
     const methodLabel = METHODS.find((m) => m.id === method)!.label;
     const text = `New order ${ref}\n\n${body}\n\nTotal: ${inr(total)}\nPayment: ${methodLabel}${
       txnRef ? ` (UPI ref ${txnRef})` : " — to be collected"
-    }\n\nName: ${form.name}\nPhone: ${form.phone}\nAddress: ${form.address}${
+    }\n\nName: ${form.name}\nPhone: ${form.phone}${form.email ? `\nEmail: ${form.email}` : ""}\nAddress: ${form.address}${
       form.notes ? `\nNotes: ${form.notes}` : ""
     }`;
     window.open(
@@ -94,10 +108,31 @@ function Checkout() {
       "_blank",
       "noopener",
     );
-    setPlaced({ ref, name: form.name, total, method, txn: txnRef });
+    const receipt: ReceiptData = {
+      ref,
+      date: new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }),
+      name: form.name,
+      phone: form.phone,
+      address: form.address,
+      ...(form.email ? { email: form.email } : {}),
+      ...(form.notes ? { notes: form.notes } : {}),
+      paymentMethod: methodLabel,
+      paymentReference: txnRef,
+      paymentStatus: method === "cod" ? "Pending — cash on delivery" : "Paid (pending verification)",
+      items: detailed.map((l) => ({
+        name: l.prod.name,
+        size: l.size,
+        qty: l.qty,
+        amount: l.prod.prices[l.size] * l.qty,
+      })),
+      total,
+    };
+    setPlaced({ ref, name: form.name, total, method, txn: txnRef, receipt });
+    downloadReceipt(receipt);
     clear();
-    toast.success("Order confirmed — we'll be in touch shortly");
+    toast.success("Order confirmed — receipt downloaded");
   };
+
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -147,14 +182,62 @@ function Checkout() {
                 ? "Payment: cash on delivery — please keep the exact amount ready."
                 : `Payment: ${METHODS.find((m) => m.id === placed.method)!.label} · reference ${placed.txn} (we'll verify and confirm on WhatsApp).`}
             </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Button asChild>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <Button
+                className="bg-gold text-accent-foreground hover:bg-gold/90"
+                onClick={() => downloadReceipt(placed.receipt)}
+              >
+                <Download className="size-4" /> Download receipt
+              </Button>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  const shared = await shareReceipt(
+                    placed.receipt,
+                    `Receipt for order ${placed.ref} — Srinivasa Home Foods`,
+                  );
+                  if (!shared) {
+                    downloadReceipt(placed.receipt);
+                    window.open(
+                      `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
+                        `Receipt for order ${placed.ref} — ${inr(placed.total)}. Attaching the PDF just downloaded.`,
+                      )}`,
+                      "_blank",
+                      "noopener",
+                    );
+                    toast.message("Receipt downloaded — attach it in WhatsApp");
+                  }
+                }}
+              >
+                <MessageCircle className="size-4" /> Send on WhatsApp
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  downloadReceipt(placed.receipt);
+                  const subject = `Receipt — order ${placed.ref} | Srinivasa Home Foods`;
+                  const body = `Order ${placed.ref}\nTotal: ${inr(placed.total)}\nPayment: ${
+                    METHODS.find((m) => m.id === placed.method)!.label
+                  }${placed.txn ? ` (ref ${placed.txn})` : ""}\n\nThe PDF receipt has been downloaded — please attach it to this email.`;
+                  const to = placed.receipt.email ?? CONTACT.email;
+                  window.location.href = `mailto:${to}?subject=${encodeURIComponent(
+                    subject,
+                  )}&body=${encodeURIComponent(body)}`;
+                  toast.message("Receipt downloaded — attach it in your email app");
+                }}
+              >
+                <Mail className="size-4" /> Email receipt
+              </Button>
+            </div>
+            <div className="mt-4 flex flex-wrap justify-center gap-3">
+              <Button asChild variant="ghost">
                 <Link to="/menu">Continue shopping</Link>
               </Button>
-              <Button asChild variant="outline">
+              <Button asChild variant="ghost">
                 <Link to="/contact">Contact us</Link>
               </Button>
             </div>
+
           </div>
         </Reveal>
       </main>
@@ -206,6 +289,17 @@ function Checkout() {
               placeholder="10-digit mobile number"
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email (for your receipt)</Label>
+            <Input
+              id="email"
+              type="email"
+              value={form.email}
+              onChange={(e) => set("email")(e.target.value)}
+              placeholder="you@example.com"
+            />
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="address">Delivery address *</Label>
             <Textarea
