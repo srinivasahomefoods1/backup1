@@ -182,14 +182,62 @@ function Checkout() {
                 ? "Payment: cash on delivery — please keep the exact amount ready."
                 : `Payment: ${METHODS.find((m) => m.id === placed.method)!.label} · reference ${placed.txn} (we'll verify and confirm on WhatsApp).`}
             </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Button asChild>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <Button
+                className="bg-gold text-accent-foreground hover:bg-gold/90"
+                onClick={() => downloadReceipt(placed.receipt)}
+              >
+                <Download className="size-4" /> Download receipt
+              </Button>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  const shared = await shareReceipt(
+                    placed.receipt,
+                    `Receipt for order ${placed.ref} — Srinivasa Home Foods`,
+                  );
+                  if (!shared) {
+                    downloadReceipt(placed.receipt);
+                    window.open(
+                      `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
+                        `Receipt for order ${placed.ref} — ${inr(placed.total)}. Attaching the PDF just downloaded.`,
+                      )}`,
+                      "_blank",
+                      "noopener",
+                    );
+                    toast.message("Receipt downloaded — attach it in WhatsApp");
+                  }
+                }}
+              >
+                <MessageCircle className="size-4" /> Send on WhatsApp
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  downloadReceipt(placed.receipt);
+                  const subject = `Receipt — order ${placed.ref} | Srinivasa Home Foods`;
+                  const body = `Order ${placed.ref}\nTotal: ${inr(placed.total)}\nPayment: ${
+                    METHODS.find((m) => m.id === placed.method)!.label
+                  }${placed.txn ? ` (ref ${placed.txn})` : ""}\n\nThe PDF receipt has been downloaded — please attach it to this email.`;
+                  const to = placed.receipt.email ?? CONTACT.email;
+                  window.location.href = `mailto:${to}?subject=${encodeURIComponent(
+                    subject,
+                  )}&body=${encodeURIComponent(body)}`;
+                  toast.message("Receipt downloaded — attach it in your email app");
+                }}
+              >
+                <Mail className="size-4" /> Email receipt
+              </Button>
+            </div>
+            <div className="mt-4 flex flex-wrap justify-center gap-3">
+              <Button asChild variant="ghost">
                 <Link to="/menu">Continue shopping</Link>
               </Button>
-              <Button asChild variant="outline">
+              <Button asChild variant="ghost">
                 <Link to="/contact">Contact us</Link>
               </Button>
             </div>
+
           </div>
         </Reveal>
       </main>
