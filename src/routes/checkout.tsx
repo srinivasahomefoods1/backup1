@@ -68,7 +68,7 @@ function upiLink(method: PayMethod, amount: number, note: string) {
 function Checkout() {
   const { lines, total, clear } = useCart();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", phone: "", address: "", notes: "" });
+  const [form, setForm] = useState({ name: "", phone: "", email: "", address: "", notes: "" });
   const [method, setMethod] = useState<PayMethod>("phonepe");
   const [status, setStatus] = useState<PayStatus>("idle");
   const [txn, setTxn] = useState("");
@@ -88,7 +88,7 @@ function Checkout() {
     const methodLabel = METHODS.find((m) => m.id === method)!.label;
     const text = `New order ${ref}\n\n${body}\n\nTotal: ${inr(total)}\nPayment: ${methodLabel}${
       txnRef ? ` (UPI ref ${txnRef})` : " — to be collected"
-    }\n\nName: ${form.name}\nPhone: ${form.phone}\nAddress: ${form.address}${
+    }\n\nName: ${form.name}\nPhone: ${form.phone}${form.email ? `\nEmail: ${form.email}` : ""}\nAddress: ${form.address}${
       form.notes ? `\nNotes: ${form.notes}` : ""
     }`;
     window.open(
@@ -96,10 +96,31 @@ function Checkout() {
       "_blank",
       "noopener",
     );
-    setPlaced({ ref, name: form.name, total, method, txn: txnRef });
+    const receipt: ReceiptData = {
+      ref,
+      date: new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }),
+      name: form.name,
+      phone: form.phone,
+      address: form.address,
+      ...(form.email ? { email: form.email } : {}),
+      ...(form.notes ? { notes: form.notes } : {}),
+      paymentMethod: methodLabel,
+      paymentReference: txnRef,
+      paymentStatus: method === "cod" ? "Pending — cash on delivery" : "Paid (pending verification)",
+      items: detailed.map((l) => ({
+        name: l.prod.name,
+        size: l.size,
+        qty: l.qty,
+        amount: l.prod.prices[l.size] * l.qty,
+      })),
+      total,
+    };
+    setPlaced({ ref, name: form.name, total, method, txn: txnRef, receipt });
+    downloadReceipt(receipt);
     clear();
-    toast.success("Order confirmed — we'll be in touch shortly");
+    toast.success("Order confirmed — receipt downloaded");
   };
+
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
