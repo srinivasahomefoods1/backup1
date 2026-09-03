@@ -32,6 +32,8 @@ export const Route = createFileRoute("/contact")({
         property: "og:description",
         content: "Reach Srinivasa Home Foods for orders, bulk enquiries and delivery details.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Contact,
