@@ -1,7 +1,9 @@
+import { useServerFn } from "@tanstack/react-start";
 import { createFileRoute } from "@tanstack/react-router";
 import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
+import { submitEnquiry } from "@/lib/enquiry.functions";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +32,8 @@ export const Route = createFileRoute("/contact")({
         property: "og:description",
         content: "Reach Srinivasa Home Foods for orders, bulk enquiries and delivery details.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Contact,
@@ -38,17 +42,34 @@ export const Route = createFileRoute("/contact")({
 function Contact() {
   const [interest, setInterest] = useState("");
   const [sending, setSending] = useState(false);
+  const send = useServerFn(submitEnquiry);
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
+    const fd = new FormData(form);
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
+    try {
+      const res = await send({
+        data: {
+          name: String(fd.get("name") || ""),
+          phone: String(fd.get("phone") || ""),
+          email: String(fd.get("email") || ""),
+          interest: categories.find((c) => c.id === interest)?.label ?? interest,
+          message: String(fd.get("message") || ""),
+          source: "Contact page",
+        },
+      });
       form.reset();
       setInterest("");
-      toast.success("Enquiry received — we'll call you back shortly.");
-    }, 700);
+      toast.success(`Enquiry ${res.enquiryId} received — we'll call you back shortly.`);
+    } catch {
+      const text = `Enquiry from ${fd.get("name")} (${fd.get("phone")}): ${fd.get("message")}`;
+      toast.error("Couldn't save your enquiry — opening WhatsApp instead.");
+      window.open(`https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(text)}`, "_blank");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
