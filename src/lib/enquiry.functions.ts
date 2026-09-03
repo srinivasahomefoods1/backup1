@@ -30,18 +30,32 @@ async function gw(path: string, init?: RequestInit) {
 }
 
 async function ensureWorkbook(): Promise<string> {
-  const encoded = FILE_PATH.split("/").map(encodeURIComponent).join("/");
-  const found = await gw(`/me/drive/root:/${encoded}`);
-  if (found.ok) {
-    const item = (await found.json()) as { id: string };
-    return item.id;
+  const [folderName, workbookName] = FILE_PATH.split("/");
+  if (!folderName || !workbookName) throw new Error("Invalid Excel file path");
+  const folderPath = encodeURIComponent(folderName);
+  const existingFolder = await gw(`/me/drive/root:/${folderPath}`);
+  if (!existingFolder.ok && existingFolder.status !== 404) {
+    throw new Error(`Excel folder lookup failed [${existingFolder.status}]: ${await existingFolder.text()}`);
   }
+  if (existingFolder.status === 404) {
+    const createdFolder = await gw("/me/drive/root/children", {
+      method: "POST",
+      body: JSON.stringify({ name: folderName, folder: {}, "@microsoft.graph.conflictBehavior": "fail" }),
+    });
+    if (!createdFolder.ok && createdFolder.status !== 409) {
+      throw new Error(`Excel folder creation failed [${createdFolder.status}]: ${await createdFolder.text()}`);
+    }
+  }
+
+  const workbookPath = `${folderPath}/${encodeURIComponent(workbookName)}`;
+  const found = await gw(`/me/drive/root:/${workbookPath}`);
+  if (found.ok) return ((await found.json()) as { id: string }).id;
   if (found.status !== 404) {
     throw new Error(`Excel lookup failed [${found.status}]: ${await found.text()}`);
   }
   const { ENQUIRY_TEMPLATE_B64 } = await import("./enquiry-template.server");
   const bytes = Uint8Array.from(atob(ENQUIRY_TEMPLATE_B64), (c) => c.charCodeAt(0));
-  const created = await gw(`/me/drive/root:/${encoded}:/content`, {
+  const created = await gw(`/me/drive/root:/${workbookPath}:/content`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -49,8 +63,7 @@ async function ensureWorkbook(): Promise<string> {
     body: bytes,
   });
   if (!created.ok) throw new Error(`Excel upload failed [${created.status}]: ${await created.text()}`);
-  const item = (await created.json()) as { id: string };
-  return item.id;
+  return ((await created.json()) as { id: string }).id;
 }
 
 export const submitEnquiry = createServerFn({ method: "POST" })
