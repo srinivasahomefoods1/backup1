@@ -29,7 +29,21 @@ async function gw(path: string, init?: RequestInit) {
   return res;
 }
 
-async function ensureWorkbook(): Promise<string> {
+async function uploadTemplate(workbookPath: string): Promise<string> {
+  const { ENQUIRY_TEMPLATE_B64 } = await import("./enquiry-template.server");
+  const bin = atob(ENQUIRY_TEMPLATE_B64.replace(/\s/g, ""));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const created = await gw(`/me/drive/root:/${workbookPath}:/content`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+    body: bytes,
+  });
+  if (!created.ok) throw new Error(`Excel upload failed [${created.status}]: ${await created.text()}`);
+  return ((await created.json()) as { id: string }).id;
+}
+
+async function ensureWorkbook(): Promise<{ itemId: string; workbookPath: string }> {
   const [folderName, workbookName] = FILE_PATH.split("/");
   if (!folderName || !workbookName) throw new Error("Invalid Excel file path");
   const folderPath = encodeURIComponent(folderName);
@@ -49,27 +63,32 @@ async function ensureWorkbook(): Promise<string> {
 
   const workbookPath = `${folderPath}/${encodeURIComponent(workbookName)}`;
   const found = await gw(`/me/drive/root:/${workbookPath}`);
-  if (found.ok) return ((await found.json()) as { id: string }).id;
+  if (found.ok) return { itemId: ((await found.json()) as { id: string }).id, workbookPath };
   if (found.status !== 404) {
     throw new Error(`Excel lookup failed [${found.status}]: ${await found.text()}`);
   }
-  const { ENQUIRY_TEMPLATE_B64 } = await import("./enquiry-template.server");
-  const bytes = Uint8Array.from(atob(ENQUIRY_TEMPLATE_B64), (c) => c.charCodeAt(0));
-  const created = await gw(`/me/drive/root:/${workbookPath}:/content`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    },
-    body: bytes,
-  });
-  if (!created.ok) throw new Error(`Excel upload failed [${created.status}]: ${await created.text()}`);
-  return ((await created.json()) as { id: string }).id;
+  return { itemId: await uploadTemplate(workbookPath), workbookPath };
+}
+
+const COL_END = "I";
+
+async function appendRow(itemId: string, row: (string | number)[]): Promise<Response> {
+  const used = await gw(
+    `/me/drive/items/${itemId}/workbook/worksheets('Enquiries')/usedRange(valuesOnly=true)?$select=rowCount`,
+  );
+  if (!used.ok) return used;
+  const { rowCount } = (await used.json()) as { rowCount: number };
+  const target = (rowCount || 1) + 1;
+  return gw(
+    `/me/drive/items/${itemId}/workbook/worksheets('Enquiries')/range(address='A${target}:${COL_END}${target}')`,
+    { method: "PATCH", body: JSON.stringify({ values: [row] }) },
+  );
 }
 
 export const submitEnquiry = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => schema.parse(data))
   .handler(async ({ data }) => {
-    const itemId = await ensureWorkbook();
+    const { itemId, workbookPath } = await ensureWorkbook();
     const enquiryId = `ENQ-${Date.now().toString(36).toUpperCase()}`;
     const row = [
       enquiryId,
@@ -82,10 +101,19 @@ export const submitEnquiry = createServerFn({ method: "POST" })
       data.source || "website",
       "New",
     ];
-    const res = await gw(`/me/drive/items/${itemId}/workbook/tables/Enquiries/rows/add`, {
-      method: "POST",
-      body: JSON.stringify({ values: [row] }),
-    });
-    if (!res.ok) throw new Error(`Excel append failed [${res.status}]: ${await res.text()}`);
+
+    let res = await appendRow(itemId, row);
+    if (!res.ok) {
+      const body = await res.text();
+      // A previously written workbook can be unreadable by Excel services; replace it and retry once.
+      if (body.includes("FileCorruptTryRepair") || body.includes("unsupportedWorkbook")) {
+        const freshId = await uploadTemplate(workbookPath);
+        res = await appendRow(freshId, row);
+        if (!res.ok) throw new Error(`Excel append failed [${res.status}]: ${await res.text()}`);
+      } else {
+        throw new Error(`Excel append failed [${res.status}]: ${body}`);
+      }
+    }
     return { ok: true as const, enquiryId };
   });
+
