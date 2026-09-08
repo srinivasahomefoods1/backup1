@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import {
   AlertCircle,
   CheckCircle2,
@@ -20,6 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { CONTACT, UPI, products } from "@/data/products";
 import { inr, useCart } from "@/lib/cart";
+import { placeOrder as placeOrderFn } from "@/lib/orders.functions";
 import { downloadReceipt, shareReceipt, type ReceiptData } from "@/lib/receipt";
 
 
@@ -80,6 +82,7 @@ function upiLink(method: PayMethod, amount: number, note: string) {
 function Checkout() {
   const { lines, total, clear } = useCart();
   const navigate = useNavigate();
+  const placeOrder = useServerFn(placeOrderFn);
   const [form, setForm] = useState({ name: "", phone: "", email: "", address: "", notes: "" });
   const [method, setMethod] = useState<PayMethod>("phonepe");
   const [status, setStatus] = useState<PayStatus>("idle");
@@ -93,7 +96,28 @@ function Checkout() {
 
   const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
 
-  const finalise = (ref: string, txnRef: string) => {
+  const finalise = async (fallbackRef: string, txnRef: string) => {
+    let ref = fallbackRef;
+    let serverTotal = total;
+    try {
+      const saved = await placeOrder({
+        data: {
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
+          address: form.address,
+          notes: form.notes,
+          paymentMethod: method,
+          paymentReference: txnRef,
+          items: detailed.map((l) => ({ slug: l.prod.id, size: l.size, qty: l.qty })),
+        },
+      });
+      ref = saved.orderNumber;
+      serverTotal = saved.total;
+    } catch (err) {
+      console.error(err);
+      toast.error("We couldn't save the order automatically — sending it on WhatsApp instead.");
+    }
     const body = detailed
       .map((l) => `• ${l.prod.name} — ${l.size} x${l.qty} = ${inr(l.prod.prices[l.size] * l.qty)}`)
       .join("\n");
@@ -125,9 +149,9 @@ function Checkout() {
         qty: l.qty,
         amount: l.prod.prices[l.size] * l.qty,
       })),
-      total,
+      total: serverTotal,
     };
-    setPlaced({ ref, name: form.name, total, method, txn: txnRef, receipt });
+    setPlaced({ ref, name: form.name, total: serverTotal, method, txn: txnRef, receipt });
     downloadReceipt(receipt);
     clear();
     toast.success("Order confirmed — receipt downloaded");
@@ -143,7 +167,7 @@ function Checkout() {
     const ref = `SHF-${Date.now().toString(36).toUpperCase().slice(-6)}`;
 
     if (method === "cod") {
-      finalise(ref, "");
+      void finalise(ref, "");
       return;
     }
 
@@ -163,7 +187,9 @@ function Checkout() {
     const ref =
       (window as unknown as { __shfRef?: string }).__shfRef ??
       `SHF-${Date.now().toString(36).toUpperCase().slice(-6)}`;
-    window.setTimeout(() => finalise(ref, txn.trim()), 900);
+    window.setTimeout(() => {
+      void finalise(ref, txn.trim());
+    }, 900);
   };
 
   if (placed) {
