@@ -121,7 +121,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         customer_id: customerId,
         payment_method: "UPI",
         amount: subtotal,
-        upi_id: UPI_ID,
+        upi_id: upiSetting?.value ?? null,
         upi_transaction_id: data.paymentReference || null,
         status: "SUBMITTED",
       });
