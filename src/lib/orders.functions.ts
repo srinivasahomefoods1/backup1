@@ -111,6 +111,11 @@ export const placeOrder = createServerFn({ method: "POST" })
     if (itemsErr) throw new Error(itemsErr.message);
 
     if (!isCod) {
+      const { data: upiSetting } = await supabaseAdmin
+        .from("app_settings")
+        .select("value")
+        .eq("key", "business_upi_id")
+        .maybeSingle();
       await supabaseAdmin.from("payments").insert({
         order_id: order.id,
         customer_id: customerId,
