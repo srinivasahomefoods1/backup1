@@ -90,7 +90,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         order_number: orderNumber,
         customer_id: customerId,
         source: "website",
-        status: "NEW",
+        status: isCod ? "NEW" : "PAYMENT_VERIFICATION",
         subtotal,
         total_amount: subtotal,
         customer_name: data.name,
