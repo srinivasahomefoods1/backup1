@@ -98,7 +98,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         customer_email: data.email || null,
         delivery_address: data.address,
         notes: data.notes || null,
-        payment_method: data.paymentMethod,
+        payment_method: isCod ? "COD" : "UPI",
         payment_status: isCod ? "PENDING" : "AWAITING_VERIFICATION",
       })
       .select("id, order_number")
