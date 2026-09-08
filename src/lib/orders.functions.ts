@@ -114,10 +114,11 @@ export const placeOrder = createServerFn({ method: "POST" })
       await supabaseAdmin.from("payments").insert({
         order_id: order.id,
         customer_id: customerId,
-        payment_method: data.paymentMethod,
+        payment_method: "UPI",
         amount: subtotal,
+        upi_id: UPI_ID,
         upi_transaction_id: data.paymentReference || null,
-        status: "PENDING",
+        status: "SUBMITTED",
       });
     }
 
