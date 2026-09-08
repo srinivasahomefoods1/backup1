@@ -90,7 +90,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         order_number: orderNumber,
         customer_id: customerId,
         source: "website",
-        status: "NEW",
+        status: isCod ? "NEW" : "PAYMENT_VERIFICATION",
         subtotal,
         total_amount: subtotal,
         customer_name: data.name,
@@ -98,8 +98,8 @@ export const placeOrder = createServerFn({ method: "POST" })
         customer_email: data.email || null,
         delivery_address: data.address,
         notes: data.notes || null,
-        payment_method: data.paymentMethod,
-        payment_status: isCod ? "PENDING" : "AWAITING_VERIFICATION",
+        payment_method: isCod ? "COD" : "UPI",
+        payment_status: isCod ? "PENDING" : "SUBMITTED",
       })
       .select("id, order_number")
       .single();
@@ -111,13 +111,19 @@ export const placeOrder = createServerFn({ method: "POST" })
     if (itemsErr) throw new Error(itemsErr.message);
 
     if (!isCod) {
+      const { data: upiSetting } = await supabaseAdmin
+        .from("app_settings")
+        .select("value")
+        .eq("key", "business_upi_id")
+        .maybeSingle();
       await supabaseAdmin.from("payments").insert({
         order_id: order.id,
         customer_id: customerId,
-        payment_method: data.paymentMethod,
+        payment_method: "UPI",
         amount: subtotal,
+        upi_id: upiSetting?.value ?? null,
         upi_transaction_id: data.paymentReference || null,
-        status: "PENDING",
+        status: "SUBMITTED",
       });
     }
 
