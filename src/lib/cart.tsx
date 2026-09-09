@@ -19,7 +19,10 @@ interface CartCtx {
   setOpen: (v: boolean) => void;
 }
 
-const Ctx = createContext<CartCtx | null>(null);
+// Keep a single context instance across hot-reloads so provider/consumer never
+// end up bound to two different module copies.
+const g = globalThis as unknown as { __shfCartCtx?: React.Context<CartCtx | null> };
+const Ctx = (g.__shfCartCtx ??= createContext<CartCtx | null>(null));
 const KEY = "shf-cart";
 
 export function CartProvider({ children }: { children: ReactNode }) {
