@@ -35,6 +35,39 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          new_value: Json | null
+          old_value: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           cart_id: string
@@ -389,6 +422,7 @@ export type Database = {
           gateway_provider: string | null
           id: string
           order_id: string
+          paid_at: string | null
           payment_method: string
           payment_screenshot_url: string | null
           rejection_reason: string | null
@@ -408,6 +442,7 @@ export type Database = {
           gateway_provider?: string | null
           id?: string
           order_id: string
+          paid_at?: string | null
           payment_method: string
           payment_screenshot_url?: string | null
           rejection_reason?: string | null
@@ -427,6 +462,7 @@ export type Database = {
           gateway_provider?: string | null
           id?: string
           order_id?: string
+          paid_at?: string | null
           payment_method?: string
           payment_screenshot_url?: string | null
           rejection_reason?: string | null
@@ -547,6 +583,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -718,6 +784,10 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       next_order_number: { Args: never; Returns: string }
+      verify_payment: {
+        Args: { _approve: boolean; _payment_id: string; _reason?: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "staff" | "user"
