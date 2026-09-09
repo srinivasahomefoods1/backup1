@@ -100,7 +100,7 @@ export const imageFor = (c: Category) =>
 export const CONTACT = {
   phone: "+91 63036 49148",
   phoneHref: "+916303649148",
-  whatsapp: "916303649148",
+  whatsapp: "+916303649148",
   email: "srinivasahomefoods1@gmail.com",
   address: "Balapur, Hyderabad, Telangana 500005",
   hours: "Mon – Sat · 9:00 AM – 8:00 PM",
