@@ -1,16 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Download,
-  Loader2,
-  Mail,
-  MessageCircle,
-  ShoppingBag,
-  Smartphone,
-  Wallet,
-} from "lucide-react";
+import { CheckCircle2, MessageCircle, ShoppingBag } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Reveal } from "@/components/Reveal";
@@ -19,11 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { CONTACT, UPI, products } from "@/data/products";
+import { CONTACT, products } from "@/data/products";
 import { inr, useCart } from "@/lib/cart";
 import { placeOrder as placeOrderFn } from "@/lib/orders.functions";
-import { downloadReceipt, shareReceipt, type ReceiptData } from "@/lib/receipt";
-
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -32,12 +20,12 @@ export const Route = createFileRoute("/checkout")({
       {
         name: "description",
         content:
-          "Confirm your Srinivasa Home Foods order — share your delivery details and pay with PhonePe, Google Pay, any UPI app or cash on delivery.",
+          "Confirm your Srinivasa Home Foods order and send your complete order details to WhatsApp.",
       },
       { property: "og:title", content: "Checkout | Srinivasa Home Foods" },
       {
         property: "og:description",
-        content: "Place your order for homemade podulu, snacks and sweets and pay via UPI or cash.",
+        content: "Place your order through WhatsApp and complete payment with our team.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -46,47 +34,24 @@ export const Route = createFileRoute("/checkout")({
   component: Checkout,
 });
 
-type PayMethod = "phonepe" | "gpay" | "upi" | "cod";
-type PayStatus = "idle" | "awaiting" | "verifying" | "failed";
-
-const METHODS: { id: PayMethod; label: string; hint: string }[] = [
-  { id: "phonepe", label: "PhonePe", hint: "Pay instantly via UPI" },
-  { id: "gpay", label: "Google Pay", hint: "Pay instantly via UPI" },
-  { id: "upi", label: "Any UPI app", hint: "Paytm, BHIM, bank apps" },
-  { id: "cod", label: "Cash on delivery", hint: "Pay when it arrives" },
-];
-
 interface Placed {
   ref: string;
   name: string;
   total: number;
-  method: PayMethod;
-  txn: string;
-  receipt: ReceiptData;
-}
-
-
-function upiLink(method: PayMethod, amount: number, note: string) {
-  const params = new URLSearchParams({
-    pa: UPI.id,
-    pn: UPI.payeeName,
-    am: amount.toFixed(2),
-    cu: "INR",
-    tn: note,
-  }).toString();
-  if (method === "phonepe") return `phonepe://pay?${params}`;
-  if (method === "gpay") return `tez://upi/pay?${params}`;
-  return `upi://pay?${params}`;
 }
 
 function Checkout() {
   const { lines, total, clear } = useCart();
   const navigate = useNavigate();
   const placeOrder = useServerFn(placeOrderFn);
-  const [form, setForm] = useState({ name: "", phone: "", email: "", address: "", notes: "" });
-  const [method, setMethod] = useState<PayMethod>("phonepe");
-  const [status, setStatus] = useState<PayStatus>("idle");
-  const [txn, setTxn] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    notes: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
   const [placed, setPlaced] = useState<Placed | null>(null);
 
   const detailed = lines.flatMap((l) => {
@@ -94,102 +59,106 @@ function Checkout() {
     return prod ? [{ ...l, prod }] : [];
   });
 
-  const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const set = (k: keyof typeof form) => (v: string) =>
+    setForm((f) => ({ ...f, [k]: v }));
 
-  const finalise = async (fallbackRef: string, txnRef: string) => {
-    let ref = fallbackRef;
-    let serverTotal = total;
-    try {
-      const saved = await placeOrder({
-        data: {
-          name: form.name,
-          phone: form.phone,
-          email: form.email,
-          address: form.address,
-          notes: form.notes,
-          paymentMethod: method,
-          paymentReference: txnRef,
-          items: detailed.map((l) => ({ slug: l.prod.id, size: l.size, qty: l.qty })),
-        },
-      });
-      ref = saved.orderNumber;
-      serverTotal = saved.total;
-    } catch (err) {
-      console.error(err);
-      toast.error("We couldn't save the order automatically — sending it on WhatsApp instead.");
-    }
-    const body = detailed
-      .map((l) => `• ${l.prod.name} — ${l.size} x${l.qty} = ${inr(l.prod.prices[l.size] * l.qty)}`)
-      .join("\n");
-    const methodLabel = METHODS.find((m) => m.id === method)!.label;
-    const text = `New order ${ref}\n\n${body}\n\nTotal: ${inr(total)}\nPayment: ${methodLabel}${
-      txnRef ? ` (UPI ref ${txnRef})` : " — to be collected"
-    }\n\nName: ${form.name}\nPhone: ${form.phone}${form.email ? `\nEmail: ${form.email}` : ""}\nAddress: ${form.address}${
-      form.notes ? `\nNotes: ${form.notes}` : ""
-    }`;
-    window.open(
-      `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(text)}`,
-      "_blank",
-      "noopener",
-    );
-    const receipt: ReceiptData = {
-      ref,
-      date: new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }),
-      name: form.name,
-      phone: form.phone,
-      address: form.address,
-      ...(form.email ? { email: form.email } : {}),
-      ...(form.notes ? { notes: form.notes } : {}),
-      paymentMethod: methodLabel,
-      paymentReference: txnRef,
-      paymentStatus: method === "cod" ? "Pending — cash on delivery" : "Paid (pending verification)",
-      items: detailed.map((l) => ({
-        name: l.prod.name,
-        size: l.size,
-        qty: l.qty,
-        amount: l.prod.prices[l.size] * l.qty,
-      })),
-      total: serverTotal,
-    };
-    setPlaced({ ref, name: form.name, total: serverTotal, method, txn: txnRef, receipt });
-    downloadReceipt(receipt);
-    clear();
-    toast.success("Order confirmed — receipt downloaded");
-  };
-
-
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!/^[6-9]\d{9}$/.test(form.phone.replace(/\D/g, "").slice(-10))) {
+
+    const phone = form.phone.replace(/\D/g, "").slice(-10);
+    if (!/^[6-9]\d{9}$/.test(phone)) {
       toast.error("Please enter a valid 10-digit mobile number");
       return;
     }
-    const ref = `SHF-${Date.now().toString(36).toUpperCase().slice(-6)}`;
 
-    if (method === "cod") {
-      void finalise(ref, "");
+    if (detailed.length === 0) {
+      toast.error("Your basket is empty");
       return;
     }
 
-    // UPI: open the payment app, then wait for the customer to confirm status.
-    setStatus("awaiting");
-    const link = upiLink(method, total, `Order ${ref}`);
-    window.location.href = link;
-    (window as unknown as { __shfRef?: string }).__shfRef = ref;
-  };
+    setSubmitting(true);
 
-  const confirmPaid = () => {
-    if (txn.trim().length < 6) {
-      toast.error("Enter the UPI transaction / UTR reference from your payment app");
-      return;
+    // The database order is created before WhatsApp opens, so the admin
+    // dashboard has the order even if the customer closes WhatsApp.
+    const fallbackRef = `SHF-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+    let orderNumber = fallbackRef;
+    let serverTotal = total;
+
+    try {
+      const saved = await placeOrder({
+        data: {
+          name: form.name.trim(),
+          phone,
+          email: form.email.trim(),
+          address: form.address.trim(),
+          notes: form.notes.trim(),
+          paymentMethod: "upi",
+          paymentReference: "",
+          items: detailed.map((l) => ({
+            slug: l.prod.id,
+            size: l.size,
+            qty: l.qty,
+          })),
+        },
+      });
+
+      orderNumber = saved.orderNumber;
+      serverTotal = saved.total;
+    } catch (err) {
+      console.error(err);
+      toast.error(
+        "We could not save the online order record, but you can still send the order to WhatsApp.",
+      );
     }
-    setStatus("verifying");
-    const ref =
-      (window as unknown as { __shfRef?: string }).__shfRef ??
-      `SHF-${Date.now().toString(36).toUpperCase().slice(-6)}`;
-    window.setTimeout(() => {
-      void finalise(ref, txn.trim());
-    }, 900);
+
+    const body = detailed
+      .map(
+        (l) =>
+          `• ${l.prod.name} — ${l.size} x${l.qty} = ${inr(
+            l.prod.prices[l.size] * l.qty,
+          )}`,
+      )
+      .join("\n");
+
+    const text = `Hello Srinivasa Home Foods,
+
+I would like to place an order.
+
+Order ID: ${orderNumber}
+
+Customer Details:
+Name: ${form.name.trim()}
+Phone: ${phone}${form.email.trim() ? `\nEmail: ${form.email.trim()}` : ""}
+
+Delivery Address:
+${form.address.trim()}
+
+Order Items:
+${body}
+
+Total Amount: ${inr(serverTotal)}
+
+Payment: I will complete the payment through WhatsApp after receiving your payment details.${
+      form.notes.trim() ? `\n\nOrder Notes:\n${form.notes.trim()}` : ""
+    }
+
+Please confirm my order and share the payment details.`;
+
+    const whatsappUrl = `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
+      text,
+    )}`;
+
+    // Open WhatsApp after the order has been saved.
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+
+    setPlaced({
+      ref: orderNumber,
+      name: form.name.trim(),
+      total: serverTotal,
+    });
+    clear();
+    setSubmitting(false);
+    toast.success("Order details are ready in WhatsApp");
   };
 
   if (placed) {
@@ -198,72 +167,49 @@ function Checkout() {
         <Reveal>
           <div className="rounded-sm border border-border bg-card p-8 text-center">
             <CheckCircle2 className="mx-auto size-14 text-primary" />
-            <h1 className="mt-4 font-display text-3xl">Thank you, {placed.name}!</h1>
+            <h1 className="mt-4 font-display text-3xl">
+              Order sent to WhatsApp
+            </h1>
             <p className="mt-2 text-muted-foreground">
-              Order <span className="font-medium text-foreground">{placed.ref}</span> for{" "}
-              <span className="font-medium text-foreground">{inr(placed.total)}</span> is confirmed.
+              Thank you, {placed.name}. Your order{" "}
+              <span className="font-medium text-foreground">{placed.ref}</span>{" "}
+              for{" "}
+              <span className="font-medium text-foreground">
+                {inr(placed.total)}
+              </span>{" "}
+              has been created.
             </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {placed.method === "cod"
-                ? "Payment: cash on delivery — please keep the exact amount ready."
-                : `Payment: ${METHODS.find((m) => m.id === placed.method)!.label} · reference ${placed.txn} (we'll verify and confirm on WhatsApp).`}
+            <p className="mt-3 text-sm text-muted-foreground">
+              Please send the pre-filled WhatsApp message. We will share the
+              payment details there, verify your payment, and confirm the order.
             </p>
-            <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              <Button
-                className="bg-gold text-accent-foreground hover:bg-gold/90"
-                onClick={() => downloadReceipt(placed.receipt)}
-              >
-                <Download className="size-4" /> Download receipt
-              </Button>
-              <Button
-                variant="outline"
-                onClick={async () => {
-                  const shared = await shareReceipt(
-                    placed.receipt,
-                    `Receipt for order ${placed.ref} — Srinivasa Home Foods`,
-                  );
-                  if (!shared) {
-                    downloadReceipt(placed.receipt);
-                    window.open(
-                      `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
-                        `Receipt for order ${placed.ref} — ${inr(placed.total)}. Attaching the PDF just downloaded.`,
-                      )}`,
-                      "_blank",
-                      "noopener",
-                    );
-                    toast.message("Receipt downloaded — attach it in WhatsApp");
-                  }
-                }}
-              >
-                <MessageCircle className="size-4" /> Send on WhatsApp
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  downloadReceipt(placed.receipt);
-                  const subject = `Receipt — order ${placed.ref} | Srinivasa Home Foods`;
-                  const body = `Order ${placed.ref}\nTotal: ${inr(placed.total)}\nPayment: ${
-                    METHODS.find((m) => m.id === placed.method)!.label
-                  }${placed.txn ? ` (ref ${placed.txn})` : ""}\n\nThe PDF receipt has been downloaded — please attach it to this email.`;
-                  const to = placed.receipt.email ?? CONTACT.email;
-                  window.location.href = `mailto:${to}?subject=${encodeURIComponent(
-                    subject,
-                  )}&body=${encodeURIComponent(body)}`;
-                  toast.message("Receipt downloaded — attach it in your email app");
-                }}
-              >
-                <Mail className="size-4" /> Email receipt
-              </Button>
-            </div>
+
+            <Button
+              className="mt-6"
+              onClick={() => {
+                const text = `Hello Srinivasa Home Foods, I am following up on order ${placed.ref}. Please share the payment details.`;
+                window.open(
+                  `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(text)}`,
+                  "_blank",
+                  "noopener,noreferrer",
+                );
+              }}
+            >
+              <MessageCircle className="size-4" />
+              Open WhatsApp
+            </Button>
+
             <div className="mt-4 flex flex-wrap justify-center gap-3">
               <Button asChild variant="ghost">
                 <Link to="/menu">Continue shopping</Link>
               </Button>
-              <Button asChild variant="ghost">
-                <Link to="/contact">Contact us</Link>
+              <Button
+                variant="ghost"
+                onClick={() => navigate({ to: "/contact" })}
+              >
+                Contact us
               </Button>
             </div>
-
           </div>
         </Reveal>
       </main>
@@ -275,7 +221,9 @@ function Checkout() {
       <main className="mx-auto max-w-2xl px-4 py-24 text-center">
         <ShoppingBag className="mx-auto size-12 text-muted-foreground" />
         <h1 className="mt-4 font-display text-3xl">Your basket is empty</h1>
-        <p className="mt-2 text-muted-foreground">Add a few favourites and come back here.</p>
+        <p className="mt-2 text-muted-foreground">
+          Add a few favourites and come back here.
+        </p>
         <Button asChild className="mt-6">
           <Link to="/menu">Browse the menu</Link>
         </Button>
@@ -288,12 +236,16 @@ function Checkout() {
       <Reveal>
         <h1 className="font-display text-4xl">Checkout</h1>
         <p className="mt-2 text-muted-foreground">
-          Tell us where to deliver and choose how you'd like to pay.
+          Enter your delivery details. We will send the complete order to
+          WhatsApp, where payment can be completed with our team.
         </p>
       </Reveal>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
-        <form onSubmit={submit} className="space-y-5 rounded-sm border border-border bg-card p-6">
+        <form
+          onSubmit={submit}
+          className="space-y-5 rounded-sm border border-border bg-card p-6"
+        >
           <div className="space-y-2">
             <Label htmlFor="name">Full name *</Label>
             <Input
@@ -304,6 +256,7 @@ function Checkout() {
               placeholder="Your name"
             />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="phone">Phone number *</Label>
             <Input
@@ -315,8 +268,9 @@ function Checkout() {
               placeholder="10-digit mobile number"
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="email">Email (for your receipt)</Label>
+            <Label htmlFor="email">Email (optional)</Label>
             <Input
               id="email"
               type="email"
@@ -337,6 +291,7 @@ function Checkout() {
               placeholder="House / street, area, city, pincode"
             />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="notes">Order notes (optional)</Label>
             <Textarea
@@ -344,125 +299,46 @@ function Checkout() {
               rows={3}
               value={form.notes}
               onChange={(e) => set("notes")(e.target.value)}
-              placeholder="Spice level, gift packing, delivery date…"
+              placeholder="Delivery instructions, gift packing, etc."
             />
           </div>
 
           <Separator />
 
-          <fieldset className="space-y-3">
-            <legend className="font-display text-xl">Payment method</legend>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {METHODS.map((m) => {
-                const active = method === m.id;
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => {
-                      setMethod(m.id);
-                      setStatus("idle");
-                    }}
-                    className={`flex items-start gap-3 rounded-sm border p-3 text-left transition-colors ${
-                      active
-                        ? "border-gold bg-gold/10"
-                        : "border-border bg-background hover:border-gold/50"
-                    }`}
-                    aria-pressed={active}
-                  >
-                    {m.id === "cod" ? (
-                      <Wallet className="mt-0.5 size-5 text-primary" />
-                    ) : (
-                      <Smartphone className="mt-0.5 size-5 text-primary" />
-                    )}
-                    <span>
-                      <span className="block text-sm font-medium">{m.label}</span>
-                      <span className="block text-xs text-muted-foreground">{m.hint}</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            {method !== "cod" && (
-              <p className="text-xs text-muted-foreground">
-                You'll pay {inr(total)} to <span className="font-medium">{UPI.id}</span>. On desktop,
-                open your UPI app and pay to this ID, then enter the reference below.
-              </p>
-            )}
-          </fieldset>
+          <div className="rounded-sm border border-border bg-secondary/30 p-4">
+            <p className="font-medium">Payment through WhatsApp</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Do not pay on this website. After you send the order on WhatsApp,
+              we will share the UPI payment details and confirm your order after
+              verifying the payment.
+            </p>
+          </div>
 
-          {status === "idle" && (
-            <Button type="submit" size="lg" className="w-full">
-              {method === "cod" ? `Place order · ${inr(total)}` : `Pay ${inr(total)} & place order`}
-            </Button>
-          )}
-
-          {status !== "idle" && method !== "cod" && (
-            <div className="space-y-3 rounded-sm border border-gold/40 bg-gold/5 p-4">
-              <div className="flex items-center gap-2 text-sm">
-                {status === "verifying" ? (
-                  <Loader2 className="size-4 animate-spin text-primary" />
-                ) : (
-                  <AlertCircle className="size-4 text-primary" />
-                )}
-                <span>
-                  {status === "verifying"
-                    ? "Verifying your payment…"
-                    : status === "failed"
-                      ? "Payment not completed. You can retry or switch to cash on delivery."
-                      : "Waiting for payment confirmation."}
-                </span>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="txn">UPI transaction / UTR reference</Label>
-                <Input
-                  id="txn"
-                  value={txn}
-                  onChange={(e) => setTxn(e.target.value)}
-                  placeholder="e.g. 4321987654321"
-                  disabled={status === "verifying"}
-                />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button type="button" onClick={confirmPaid} disabled={status === "verifying"}>
-                  I've paid — confirm order
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={status === "verifying"}
-                  onClick={() => {
-                    window.location.href = upiLink(method, total, "Srinivasa Home Foods order");
-                  }}
-                >
-                  Reopen payment app
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  disabled={status === "verifying"}
-                  onClick={() => {
-                    setStatus("failed");
-                    setMethod("cod");
-                    toast.message("Switched to cash on delivery");
-                  }}
-                >
-                  Payment failed
-                </Button>
-              </div>
-            </div>
-          )}
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full"
+            disabled={submitting}
+          >
+            <MessageCircle className="size-5" />
+            {submitting ? "Preparing your order…" : "Order through WhatsApp"}
+          </Button>
 
           <p className="text-center text-xs text-muted-foreground">
-            UPI payments are verified manually against your reference before we start cooking.
+            Your order details, customer information and total amount will be
+            included in the WhatsApp message.
           </p>
         </form>
 
         <aside className="h-fit rounded-sm border border-border bg-secondary/30 p-6">
           <h2 className="font-display text-2xl">Order summary</h2>
+
           <div className="mt-4 space-y-3">
             {detailed.map((l) => (
-              <div key={`${l.id}-${l.size}`} className="flex justify-between gap-3 text-sm">
+              <div
+                key={`${l.id}-${l.size}`}
+                className="flex justify-between gap-3 text-sm"
+              >
                 <span>
                   {l.prod.name}
                   <span className="text-muted-foreground">
@@ -470,15 +346,20 @@ function Checkout() {
                     · {l.size} × {l.qty}
                   </span>
                 </span>
-                <span className="tabular-nums">{inr(l.prod.prices[l.size] * l.qty)}</span>
+                <span className="tabular-nums">
+                  {inr(l.prod.prices[l.size] * l.qty)}
+                </span>
               </div>
             ))}
           </div>
+
           <Separator className="my-4" />
+
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Total</span>
             <span className="font-display text-2xl">{inr(total)}</span>
           </div>
+
           <Button
             variant="ghost"
             className="mt-4 w-full"
