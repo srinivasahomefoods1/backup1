@@ -89,7 +89,7 @@ export const getAdminSummary = createServerFn({ method: "GET" })
       revenue: rows
         .filter((r) => r.payment_status === "PAID")
         .reduce((s, r) => s + Number(r.total_amount), 0),
-      pendingPayments: rows.filter((r) => r.payment_status === "AWAITING_VERIFICATION").length,
+      pendingPayments: rows.filter((r) => r.payment_status === "PENDING" || r.payment_status === "SUBMITTED").length,
       newOrders: rows.filter((r) => r.status === "NEW").length,
       whatsappOrders: rows.filter((r) => r.source === "whatsapp").length,
     };
