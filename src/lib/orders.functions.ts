@@ -21,27 +21,39 @@ const orderSchema = z.object({
 export type PlaceOrderInput = z.infer<typeof orderSchema>;
 
 /**
- * Saves a website order into the shared database (same tables the WhatsApp
- * ordering flow and the admin dashboard use). Prices are always recomputed
- * server-side from product_variants — client totals are never trusted.
+ * Saves a website order into the shared database.
+ * The customer completes payment manually through WhatsApp, so UPI orders
+ * are created with PENDING payment status and can be verified by staff.
  */
 export const placeOrder = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => orderSchema.parse(input))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
 
     const slugs = [...new Set(data.items.map((i) => i.slug))];
     const { data: rows, error: prodErr } = await supabaseAdmin
       .from("products")
-      .select("id, name, slug, product_variants(id, variant_name, price)")
+      .select(
+        "id, name, slug, product_variants(id, variant_name, price)",
+      )
       .in("slug", slugs);
+
     if (prodErr) throw new Error(prodErr.message);
 
     const items = data.items.map((line) => {
       const product = rows?.find((p) => p.slug === line.slug);
-      const variant = product?.product_variants?.find((v) => v.variant_name === line.size);
-      if (!product || !variant) throw new Error(`Item unavailable: ${line.slug} ${line.size}`);
+      const variant = product?.product_variants?.find(
+        (v) => v.variant_name === line.size,
+      );
+
+      if (!product || !variant) {
+        throw new Error(`Item unavailable: ${line.slug} ${line.size}`);
+      }
+
       const unit = Number(variant.price);
+
       return {
         product_id: product.id,
         variant_id: variant.id,
@@ -55,8 +67,8 @@ export const placeOrder = createServerFn({ method: "POST" })
 
     const subtotal = items.reduce((s, i) => s + i.total_price, 0);
 
-    // Reuse an existing customer record for this phone number when we have one.
     const phone = data.phone.replace(/\D/g, "").slice(-10);
+
     const { data: existing } = await supabaseAdmin
       .from("customers")
       .select("id")
@@ -64,6 +76,7 @@ export const placeOrder = createServerFn({ method: "POST" })
       .maybeSingle();
 
     let customerId = existing?.id ?? null;
+
     if (!customerId) {
       const { data: created, error: custErr } = await supabaseAdmin
         .from("customers")
@@ -75,22 +88,26 @@ export const placeOrder = createServerFn({ method: "POST" })
         })
         .select("id")
         .single();
+
       if (custErr) throw new Error(custErr.message);
       customerId = created.id;
     }
 
-    const { data: numberRow, error: numErr } = await supabaseAdmin.rpc("next_order_number");
-    if (numErr) throw new Error(numErr.message);
-    const orderNumber = String(numberRow);
+    const { data: numberRow, error: numErr } =
+      await supabaseAdmin.rpc("next_order_number");
 
+    if (numErr) throw new Error(numErr.message);
+
+    const orderNumber = String(numberRow);
     const isCod = data.paymentMethod === "cod";
+
     const { data: order, error: orderErr } = await supabaseAdmin
       .from("orders")
       .insert({
         order_number: orderNumber,
         customer_id: customerId,
         source: "website",
-        status: isCod ? "NEW" : "PAYMENT_VERIFICATION",
+        status: isCod ? "NEW" : "PAYMENT_PENDING",
         subtotal,
         total_amount: subtotal,
         customer_name: data.name,
@@ -99,33 +116,38 @@ export const placeOrder = createServerFn({ method: "POST" })
         delivery_address: data.address,
         notes: data.notes || null,
         payment_method: isCod ? "COD" : "UPI",
-        payment_status: isCod ? "PENDING" : "SUBMITTED",
+        payment_status: "PENDING",
       })
       .select("id, order_number")
       .single();
+
     if (orderErr) throw new Error(orderErr.message);
 
     const { error: itemsErr } = await supabaseAdmin
       .from("order_items")
       .insert(items.map((i) => ({ ...i, order_id: order.id })));
+
     if (itemsErr) throw new Error(itemsErr.message);
 
-    if (!isCod) {
-      const { data: upiSetting } = await supabaseAdmin
-        .from("app_settings")
-        .select("value")
-        .eq("key", "business_upi_id")
-        .maybeSingle();
-      await supabaseAdmin.from("payments").insert({
-        order_id: order.id,
-        customer_id: customerId,
-        payment_method: "UPI",
-        amount: subtotal,
-        upi_id: upiSetting?.value ?? null,
-        upi_transaction_id: data.paymentReference || null,
-        status: "SUBMITTED",
-      });
-    }
+    // Keep a payment record so staff can mark the WhatsApp payment as paid
+    // from the admin dashboard after checking their UPI/bank account.
+    const { data: upiSetting } = await supabaseAdmin
+      .from("app_settings")
+      .select("value")
+      .eq("key", "business_upi_id")
+      .maybeSingle();
+
+    const { error: paymentErr } = await supabaseAdmin.from("payments").insert({
+      order_id: order.id,
+      customer_id: customerId,
+      payment_method: isCod ? "COD" : "UPI",
+      amount: subtotal,
+      upi_id: isCod ? null : upiSetting?.value ?? null,
+      upi_transaction_id: data.paymentReference || null,
+      status: "PENDING",
+    });
+
+    if (paymentErr) throw new Error(paymentErr.message);
 
     return { orderNumber: order.order_number, total: subtotal };
   });
