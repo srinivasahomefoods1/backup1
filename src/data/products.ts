@@ -21,6 +21,8 @@ import namakPareImg from "@/assets/namak_pare.png.asset.json";
 import mixtureImg from "@/assets/mixture.png.asset.json";
 import poornamBooreluImg from "@/assets/poornam_boorelu.png.asset.json";
 import boondiLadduImg from "@/assets/boondi_laddu.png.asset.json";
+import ribbonPakodiImg from "@/assets/ribbon_pakodi.png";
+import motichoorLadooImg from "@/assets/motichoor_ladoo.png";
 
 
 export type Category = "podi" | "snacks" | "sweets";
@@ -92,8 +94,8 @@ export const products: Product[] = [
   { id: "crispy-poori-kova-kajjikayalu", name: "Crispy Poori Kova Kajjikayalu", category: "sweets", prices: p(200, 400, 800), image: kajjikayaluImg.url },
   { id: "poornam-boorelu", name: "Poornam Boorelu", category: "sweets", prices: p(150, 300, 600), image: poornamBooreluImg.url },
   { id: "boondi-laddo", name: "Boondi Laddo", category: "sweets", image: boondiLadduImg.url, prices: p(125, 250, 500) },
-  { id: "motichoor-ladoo", name: "Motichoor Ladoo", category: "sweets", prices: p(100, 200, 400), image: boondiLadduImg.url },
-{ id: "ribbon-pakodi", name: "Ribbon Pakodi", category: "snacks", prices: p(100, 200, 400) },
+  { id: "motichoor-ladoo", name: "Motichoor Ladoo", category: "sweets", prices: p(100, 200, 400), image: motichoorLadooImg },
+{ id: "ribbon-pakodi", name: "Ribbon Pakodi", category: "snacks", prices: p(100, 200, 400), image: ribbonPakodiImg },
 ];
 
 export const imageFor = (c: Category) =>
