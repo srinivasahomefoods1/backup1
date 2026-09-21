@@ -91,7 +91,9 @@ export const products: Product[] = [
   { id: "soft-kova-kajjikayalu", name: "Soft Kova Kajjikayalu", category: "sweets", prices: p(250, 500, 1000), image: kajjikayaluImg.url },
   { id: "crispy-poori-kova-kajjikayalu", name: "Crispy Poori Kova Kajjikayalu", category: "sweets", prices: p(200, 400, 800), image: kajjikayaluImg.url },
   { id: "poornam-boorelu", name: "Poornam Boorelu", category: "sweets", prices: p(150, 300, 600), image: poornamBooreluImg.url },
-  { id: "boondi-laddo", name: "Boondi Laddo", category: "sweets", image: boondiLadduImg.url, prices: p(300, 600, 1200) },
+  { id: "boondi-laddo", name: "Boondi Laddo", category: "sweets", image: boondiLadduImg.url, prices: p(125, 250, 500) },
+  { id: "motichoor-ladoo", name: "Motichoor Ladoo", category: "sweets", prices: p(100, 200, 400), image: boondiLadduImg.url },
+{ id: "ribbon-pakodi", name: "Ribbon Pakodi", category: "snacks", prices: p(100, 200, 400) },
 ];
 
 export const imageFor = (c: Category) =>
