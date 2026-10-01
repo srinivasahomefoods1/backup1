@@ -46,13 +46,15 @@ function MenuPage() {
   const visibleCategories = isAll ? categories : categories.filter((c) => c.id === active);
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-16">
+    <div className="mx-auto max-w-6xl px-3 pb-24 pt-6 sm:px-5 sm:py-16">
       <Reveal>
         <p className="rule-ornament text-xs uppercase tracking-[0.4em] text-spice">
           Homemade podulu, snacks & sweets
         </p>
-        <h1 className="mt-4 text-center text-5xl md:text-6xl">Our Menu</h1>
-        <p className="mx-auto mt-4 max-w-xl text-center text-muted-foreground">
+        <h1 className="mt-3 text-center text-4xl sm:mt-4 sm:text-5xl md:text-6xl">
+  Our Menu
+</h1>
+        <p className="mx-auto mt-3 max-w-xl text-center text-sm text-muted-foreground sm:mt-4 sm:text-base">
           Pure ingredients · Traditional taste · Homemade with love. Choose a pack size and add it
           to your basket — we confirm every order personally.
         </p>
@@ -60,14 +62,14 @@ function MenuPage() {
 
       {/* Category filter bar */}
       <Reveal delay={80}>
-        <div className="sticky top-[4.5rem] z-20 mt-10 flex flex-wrap justify-center gap-2 rounded-sm border border-border bg-card/95 p-2 backdrop-blur">
+        <div className="sticky top-16 z-20 -mx-3 mt-6 overflow-x-auto border-y border-border bg-card/95 px-3 py-2 backdrop-blur sm:static sm:mx-0 sm:mt-10 sm:overflow-visible sm:rounded-sm sm:border sm:p-2">
           {FILTERS.map((f) => (
             <Link
               key={f.id}
               from="/menu"
               search={(prev) => ({ ...prev, cat: f.id })}
               className={cn(
-                "rounded-sm px-5 py-2 text-sm uppercase tracking-[0.15em] transition-colors",
+                "shrink-0 rounded-full px-4 py-2 text-[0.68rem] font-medium uppercase tracking-[0.1em] transition-colors sm:rounded-sm sm:px-5 sm:text-sm sm:tracking-[0.15em]",
                 active === f.id
                   ? "bg-gold text-accent-foreground"
                   : "text-muted-foreground hover:border-gold/50 hover:text-foreground",
@@ -111,37 +113,50 @@ function MenuPage() {
         })()}
 
       {visibleCategories.map((cat) => {
-        const items = products.filter((p) => p.category === cat.id);
-        return (
-          <section key={cat.id} id={cat.id} className="scroll-mt-32 pt-12 first:pt-10">
-            {isAll && (
-              <Reveal>
-                <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-4">
-                  <div>
-                    <h2 className="text-3xl">{cat.label}</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">{cat.blurb}</p>
-                  </div>
-                  <span className="text-xs uppercase tracking-[0.3em] text-spice">
-                    {items.length} varieties
-                  </span>
-                </div>
-              </Reveal>
-            )}
+  const items = products.filter((p) => p.category === cat.id);
 
-            <div className={cn("grid gap-6 sm:grid-cols-2 lg:grid-cols-3", isAll ? "mt-8" : "mt-8")}>
-              {items.map((p, i) => (
-                <Reveal key={p.id} delay={(i % 3) * 90}>
-                  <ProductCard product={p} />
-                </Reveal>
-              ))}
+  return (
+    <section
+      key={cat.id}
+      id={cat.id}
+      className="scroll-mt-28 pt-8 first:pt-6 sm:pt-12 sm:first:pt-10"
+    >
+      {isAll && (
+        <Reveal>
+          <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-4">
+            <div>
+              <h2 className="text-3xl">{cat.label}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{cat.blurb}</p>
             </div>
-          </section>
-        );
-      })}
+
+            <span className="text-xs uppercase tracking-[0.3em] text-spice">
+              {items.length} varieties
+            </span>
+          </div>
+        </Reveal>
+      )}
+
+      <div
+        className={cn(
+          "grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3",
+          isAll ? "mt-5 sm:mt-8" : "mt-5 sm:mt-8",
+        )}
+      >
+        {items.map((p, i) => (
+          <Reveal key={p.id} delay={(i % 3) * 90}>
+            <ProductCard product={p} />
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+})}
+
+
 
       {/* When a category filter is active, hide the full price table for focus */}
       {isAll && (
-        <Reveal className="mt-24">
+  <Reveal className="mt-16 hidden sm:block sm:mt-24">
           <h2 className="text-center text-3xl">Complete price list</h2>
           <div className="mt-8 overflow-x-auto rounded-sm border border-border">
             <table className="w-full min-w-[36rem] text-left text-sm">
